@@ -1,0 +1,44 @@
+
+
+#Every object in Kubernetes belongs to an API.
+apiVersion: apps/v1
+#This tells Kubernetes that I am creating a Deployment object.
+kind: Deployment
+
+#Everything inside metadata identifies this deployment object.
+metadata:
+  name: ms-wallet
+
+#This is the most important section. Everything Kubernetes should do is described here
+spec:
+  replicas: 1 # Meaning. Always keep 1 Pod Running. If Pod dies, Create another one. If Node dies, Create another Pod on another node.
+              # You are NOT creating a Pod. You are saying Desired Pods = 1. Deployment delegates this responsibility to ReplicaSet.
+#This is probably the most misunderstood section. Suppose Kubernetes has Pod A, app=wallet, Pad B, app=user and Pod C, app=ms-wallet. 
+#Then this selector helps it find which pod needs to be managed. It matches this matchlabels exactly defined here and manage only these podd.
+  selector:
+    matchLabels:
+      app: ms-wallet
+
+# Template has also labels. what is its usages? Every Pod created gets this label. It is used when selector select pods using label defined 
+# in selector. Both lebels should match. template label is used while creating a pod whereas selector label is used while selecting a pod.
+# This template is used whenever a new pod is created whether it is at the begining or due to maintaining replicaSet. this template is copied
+# exactly to maintain uniformity while creating a pod for this service deployment
+  template:
+    metadata:
+      labels:
+        app: ms-wallet
+# This spec detail is about the detail of container inside a pod. it tells what will be the name of container, which image it will use, 
+# defines imagePullPolicy, port no inside container at which application will run
+    spec:
+      containers:
+        - name: wallet
+
+          image: ms-wallet:1.0
+
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 8081
+            
+            
+            

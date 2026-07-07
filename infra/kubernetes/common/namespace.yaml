@@ -1,0 +1,27 @@
+# ==========================================================
+# Kubernetes Namespace
+# File      : namespace.yaml
+# Project   : MSIMPL - Microservices Platform
+# Author    : Sanjeev Kumar
+#
+# Description
+# -----------
+# Creates a dedicated namespace for all MSIMPL
+# Kubernetes resources.
+#
+# Namespace
+# ----------
+# msimpl
+#
+# ==========================================================
+
+apiVersion: v1
+kind: Namespace
+
+metadata:
+  name: msimpl
+
+  labels:
+    app.kubernetes.io/name: msimpl
+    app.kubernetes.io/part-of: microservices-platform
+    app.kubernetes.io/managed-by: kubectl

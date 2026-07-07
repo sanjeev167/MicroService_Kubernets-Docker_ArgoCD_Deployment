@@ -1,0 +1,198 @@
+# =============================================================================
+# File Name   : deployment.yml
+# Module      : Kubernetes Deployment
+# Service     : MS Wallet Service
+# Project     : Microservices Platform (MSIMPL)
+# Author      : Sanjeev Kumar
+# Created On  : 02-Jul-2026
+# Description :
+# -----------------------------------------------------------------------------
+# This Deployment manifest instructs Kubernetes to deploy and manage the
+# MS Wallet Spring Boot application.
+#
+# Responsibilities:
+#   - Creates a Deployment object.
+#   - Maintains the desired number of Pod replicas.
+#   - Creates Pods using the defined Pod template.
+#   - Starts containers using the specified Docker image.
+#   - Automatically recreates Pods if they fail.
+#
+# NOTE:
+# This is the initial version of the Deployment manifest. Additional enterprise
+# configurations such as ConfigMap, Secret, Health Probes, Resource Limits,
+# Rolling Updates, and Security Context will be added gradually in upcoming
+# modules.
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# Every Kubernetes object belongs to an API Group and Version.
+#
+# Deployment objects are part of the "apps" API group.
+# -----------------------------------------------------------------------------
+apiVersion: apps/v1
+
+
+# -----------------------------------------------------------------------------
+# Specifies the type of Kubernetes object to create.
+#
+# Here we are creating a Deployment object.
+# -----------------------------------------------------------------------------
+kind: Deployment
+
+
+# -----------------------------------------------------------------------------
+# Metadata uniquely identifies this Deployment object inside the cluster.
+# -----------------------------------------------------------------------------
+metadata:
+  name: ms-wallet
+
+
+# -----------------------------------------------------------------------------
+# The "spec" section defines the desired state of the Deployment.
+# Kubernetes continuously works to keep the cluster in this desired state.
+# -----------------------------------------------------------------------------
+spec:
+
+  # ---------------------------------------------------------------------------
+  # Desired number of Pod replicas.
+  #
+  # This does NOT create a Pod directly.
+  # Instead, the Deployment delegates this responsibility to a ReplicaSet,
+  # which continuously ensures that exactly one Pod is running.
+  #
+  # If a Pod crashes:
+  #     -> ReplicaSet creates another Pod.
+  #
+  # If the worker node fails:
+  #     -> Kubernetes schedules a new Pod on another available node.
+  # ---------------------------------------------------------------------------
+  replicas: 1
+
+
+  # ---------------------------------------------------------------------------
+  # Selector tells the Deployment which Pods belong to it.
+  #
+  # Kubernetes matches Pods based on labels.
+  #
+  # Example:
+  #
+  # Pod A
+  #     app = wallet
+  #
+  # Pod B
+  #     app = user
+  #
+  # Pod C
+  #     app = ms-wallet
+  #
+  # This Deployment manages only Pods having:
+  #
+  #     app = ms-wallet
+  #
+  # The selector label MUST exactly match the labels defined in the
+  # Pod Template below.
+  # ---------------------------------------------------------------------------
+  selector:
+    matchLabels:
+      app: ms-wallet
+
+
+  # ---------------------------------------------------------------------------
+  # Pod Template
+  #
+  # This section acts as a blueprint for creating Pods.
+  #
+  # Whenever Kubernetes needs to create a new Pod
+  # (initial deployment, scaling, self-healing, etc.)
+  # it copies this template exactly.
+  #
+  # This guarantees that every Pod created by this Deployment
+  # is identical.
+  # ---------------------------------------------------------------------------
+  template:
+
+    metadata:
+
+      # -----------------------------------------------------------------------
+      # Labels assigned to every Pod created from this template.
+      #
+      # These labels are later used by:
+      #
+      #   • Deployment Selector
+      #   • Services
+      #   • Monitoring
+      #   • Network Policies
+      #
+      # The selector above identifies Pods using these labels.
+      # -----------------------------------------------------------------------
+      labels:
+        app: ms-wallet
+
+
+    # -------------------------------------------------------------------------
+    # This spec belongs to the Pod (NOT the Deployment).
+    #
+    # Deployment Spec
+    #        ↓
+    # Pod Template
+    #        ↓
+    # Pod Spec
+    #
+    # Here we define how the container inside the Pod should run.
+    # -------------------------------------------------------------------------
+    spec:
+
+      containers:
+
+        # ---------------------------------------------------------------------
+        # Logical name of the container inside the Pod.
+        # ---------------------------------------------------------------------
+        - name: wallet
+
+
+          # -------------------------------------------------------------------
+          # Docker Image to run inside the container.
+          #
+          # Local Development:
+          #     Uses the image available in Docker Desktop.
+          #
+          # Production (AWS EKS):
+          #
+          # image:
+          # <account-id>.dkr.ecr.ap-south-1.amazonaws.com/ms-wallet:1.0
+          # -------------------------------------------------------------------
+          image: ms-wallet:1.0
+
+
+          # -------------------------------------------------------------------
+          # Image Pull Policy
+          #
+          # Never
+          #     Use the locally available image.
+          #
+          # This is suitable for local development because the image already
+          # exists inside Docker Desktop.
+          #
+          # Production:
+          #
+          # Normally this becomes:
+          #
+          # imagePullPolicy: IfNotPresent
+          #
+          # Kubernetes pulls the image from Amazon ECR only if it is not already
+          # available on the worker node.
+          # -------------------------------------------------------------------
+          imagePullPolicy: Never
+
+
+          # -------------------------------------------------------------------
+          # Port exposed by the application inside the container.
+          #
+          # NOTE:
+          # This does NOT expose the application outside Kubernetes.
+          #
+          # External access will be provided later using a Kubernetes Service.
+          # -------------------------------------------------------------------
+          ports:
+            - containerPort: 8081

@@ -1,0 +1,134 @@
+package com.orchestrator.ctrl;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.orchestrator.dto.WalletTransactionRequest;
+import com.orchestrator.service.TransactionOrchestratorService;
+import com.orchestrator.util.TraceUtil;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * ==========================================================
+ * TRANSACTION CONTROLLER (OBSERVABILITY + TRACEABILITY)
+ * ==========================================================
+ *
+ * AUTHOR: Sanjeev Kumar  
+ * DATE:   June 16, 2026
+ *
+ * PURPOSE:
+ * - Entry point for initiating Saga transactions
+ * - Generate traceId (until Gateway is introduced)
+ * - Enable end-to-end request tracing across services
+ *
+ * ==========================================================
+ * TRACEABILITY DESIGN
+ * ==========================================================
+ *
+ * ✔ traceId generated at entry point (controller)  
+ * ✔ Stored in MDC using {@link TraceUtil}  
+ * ✔ Automatically included in logs via Logback  
+ *
+ * FLOW:  
+ * Client → Controller (traceId created)  
+ * → Service → Kafka Producer (header)  
+ * → Kafka → Downstream Consumers  
+ *
+ * FUTURE (Gateway Integration):  
+ * - Gateway will generate traceId  
+ * - Controller will only extract and set it  
+ *
+ * ==========================================================
+ * RESPONSIBILITIES
+ * ==========================================================
+ *
+ * ✔ Accept API request  
+ * ✔ Generate and manage traceId lifecycle  
+ * ✔ Log request details  
+ * ✔ Delegate to orchestrator service  
+ *
+ * ==========================================================
+ * NON-RESPONSIBILITIES
+ * ==========================================================
+ *
+ * ❌ Does NOT create transactionId  
+ * ❌ Does NOT create Kafka events  
+ * ❌ Does NOT contain business logic  
+ * ❌ Does NOT emit metrics  
+ *
+ * ==========================================================
+ */
+@RestController
+@RequestMapping("/transaction")
+@RequiredArgsConstructor
+@Slf4j
+public class TransactionController {
+
+    private final TransactionOrchestratorService orchestratorService;
+
+    /**
+     * Initiates wallet transaction (Saga start).
+     *
+     * @param request Wallet transaction request payload
+     * @return ResponseEntity with sagaId confirmation
+     */
+    @PostMapping("/wallet")
+   public ResponseEntity<String> initiateWalletTransaction( @RequestBody WalletTransactionRequest request, @RequestHeader(value = "traceId", required = false) String incomingTraceId) {
+
+    // --------------------------------------------------
+    // STEP 0: TRACE INITIALIZATION
+    // --------------------------------------------------
+
+    /*
+     * TRACE STRATEGY:
+     * ----------------------------------------------
+     * ✔ If traceId comes from Gateway → use it
+     * ✔ Else → generate new traceId
+     */
+    String traceId = (incomingTraceId != null && !incomingTraceId.isBlank())
+            ? incomingTraceId
+            : TraceUtil.generateTraceId();
+
+    TraceUtil.setTraceId(traceId);
+
+    try {
+        // --------------------------------------------------
+        // STEP 1: LOG REQUEST
+        // --------------------------------------------------
+        log.info(
+                "Received API request | traceId={} | userId={} | walletId={} | amount={} | operationType={}",
+                traceId,
+                request.getUserId(),
+                request.getWalletId(),
+                request.getAmount(),
+                request.getWalletOperationType()
+        );
+
+        // --------------------------------------------------
+        // STEP 2: DELEGATE TO ORCHESTRATOR
+        // --------------------------------------------------
+        String sagaId = orchestratorService.startTransaction(
+                request.getWalletId(),
+                request.getAmount(),
+                request.getWalletOperationType(),
+                request.getUserId()
+        );
+
+        log.info("Transaction initiated successfully | sagaId={} | traceId={}", sagaId, traceId);
+
+        // --------------------------------------------------
+        // STEP 3: RESPONSE
+        // --------------------------------------------------
+        return ResponseEntity.ok("Transaction initiated. sagaId=" + sagaId);
+
+    } finally {
+        // --------------------------------------------------
+        // STEP 4: CLEAR TRACE CONTEXT
+        // --------------------------------------------------
+        TraceUtil.clear();
+    }
+}
+
+}

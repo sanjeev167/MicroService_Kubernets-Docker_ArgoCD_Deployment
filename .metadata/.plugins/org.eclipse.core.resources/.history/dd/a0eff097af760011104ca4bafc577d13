@@ -1,0 +1,78 @@
+# ==========================================================
+# FILE             : kafka.env
+# MODULE           : Apache Kafka Environment Configuration
+# PROJECT          : MSIMPL - Microservices Platform
+# AUTHOR           : Sanjeev Kumar
+# CREATED ON       : 03-Jul-2026
+# LAST MODIFIED    : 03-Jul-2026
+# VERSION          : 1.0.0
+# ==========================================================
+#
+# PURPOSE
+# ----------------------------------------------------------
+# Centralized environment configuration for Apache Kafka.
+#
+# This file externalizes Kafka configuration used by
+# Docker Compose so that environment-specific values are
+# maintained separately from infrastructure definitions.
+#
+# DEPLOYMENT TARGET
+# ----------------------------------------------------------
+# ✔ Local Development (STS)
+#
+# Future Support
+# ----------------------------------------------------------
+# ✔ Docker Compose
+# ✔ Kubernetes
+# ✔ AWS EKS
+#
+# DESIGN PRINCIPLES
+# ----------------------------------------------------------
+# ✔ Environment-specific configuration
+# ✔ No hardcoded infrastructure values
+# ✔ Reusable across deployment environments
+# ✔ Single source of truth for Kafka settings
+#
+# VERSION HISTORY
+# ----------------------------------------------------------
+# Version    Date         Author           Description
+# ----------------------------------------------------------
+# 1.0.0      03-Jul-2026  Sanjeev Kumar    Initial version
+#
+# ==========================================================
+
+
+# ==========================================================
+# Kafka Cluster Configuration
+# ==========================================================
+
+CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
+KAFKA_NODE_ID=1
+
+
+# ==========================================================
+# Kafka Listener Configuration
+# ==========================================================
+
+KAFKA_INTERNAL_HOST=kafka
+KAFKA_INTERNAL_PORT=9092
+
+KAFKA_EXTERNAL_HOST=localhost
+KAFKA_EXTERNAL_PORT=29092
+
+KAFKA_CONTROLLER_PORT=9093
+
+
+# ==========================================================
+# Kafka Storage Configuration
+# ==========================================================
+
+KAFKA_LOG_DIRS=/tmp/kraft-combined-logs
+
+
+# ==========================================================
+# Kafka Development Configuration
+# ==========================================================
+
+KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+KAFKA_AUTO_CREATE_TOPICS_ENABLE=true

@@ -1,0 +1,242 @@
+# =============================================================================
+# File Name   : application-kafka.yml
+# Module      : Apache Kafka Configuration
+# Service     : MS Wallet Service
+# Project     : MSIMPL - Microservices Platform
+# Author      : Sanjeev Kumar
+# Created On  : 30-Jun-2026
+# Last Updated: 03-Jul-2026
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+#
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|------------------------------------------
+# 1.0.0   | 30-Jun-2026 | Sanjeev Kumar  | Initial Kafka configuration.
+# 1.1.0   | 03-Jul-2026 | Sanjeev Kumar  | Refactored Kafka bootstrap server
+#         |             |                | configuration to use KAFKA_HOST and
+#         |             |                | KAFKA_PORT for environment-independent
+#         |             |                | deployment across STS, Docker,
+#         |             |                | Kubernetes and AWS.
+#
+# =============================================================================
+# PURPOSE
+# =============================================================================
+#
+# Centralized Apache Kafka configuration for the MS Wallet Service.
+#
+# This configuration supports multiple deployment environments
+# without requiring application code changes or rebuilding the
+# Docker image.
+#
+# Responsibilities
+# ----------------
+# ✔ Kafka Broker Configuration
+# ✔ Producer Configuration
+# ✔ Consumer Configuration
+# ✔ Topic Configuration
+# ✔ Consumer Group Configuration
+#
+# =============================================================================
+# CONFIGURATION STRATEGY
+# =============================================================================
+#
+# Spring resolves configuration properties using:
+#
+#     ${VARIABLE_NAME:DefaultValue}
+#
+# Resolution Order
+# ----------------
+#
+# 1. Environment Variable
+# 2. System Property
+# 3. Default Value
+#
+# Example
+#
+#     ${KAFKA_HOST:localhost}
+#
+# If KAFKA_HOST is defined, Spring uses its value.
+# Otherwise, it falls back to localhost.
+#
+# The default values are optimized for Spring Tool Suite (STS).
+#
+# Other deployment environments override these values through
+# Docker Compose, Kubernetes ConfigMaps, Secrets or
+# Spring Cloud Config.
+#
+# =============================================================================
+# ENVIRONMENT SUPPORT
+# =============================================================================
+#
+# Spring Tool Suite (STS)
+# -----------------------
+#
+# No environment variables are required.
+#
+# Default configuration:
+#
+#     KAFKA_HOST=localhost
+#     KAFKA_PORT=29092
+#
+# Kafka executes inside Docker while Spring Boot
+# applications execute directly from STS.
+#
+#
+# Docker Compose
+# --------------
+#
+# Docker injects:
+#
+#     KAFKA_HOST=host.docker.internal
+#
+# allowing Docker containers to communicate with Kafka
+# running on the Windows host or another Docker environment.
+#
+#
+# Kubernetes (Local)
+# ------------------
+#
+# When Kafka runs outside Kubernetes:
+#
+#     KAFKA_HOST=host.docker.internal
+#
+# When Kafka runs inside Kubernetes:
+#
+#     KAFKA_HOST=kafka-service
+#     KAFKA_PORT=9092
+#
+#
+# AWS EKS
+# -------
+#
+# Kafka may be deployed as:
+#
+# • Amazon MSK
+# • Self-managed Kafka
+#
+# Example:
+#
+#     KAFKA_HOST=<Amazon MSK Endpoint>
+#     KAFKA_PORT=9092
+#
+# Configuration is supplied using ConfigMaps,
+# Secrets or Spring Cloud Config.
+#
+# =============================================================================
+# ENVIRONMENT VARIABLES
+# =============================================================================
+#
+# KAFKA_HOST
+#     Kafka broker hostname.
+#
+# KAFKA_PORT
+#     Kafka broker port.
+#
+# =============================================================================
+# MSIMPL DEPLOYMENT STANDARD
+# =============================================================================
+#
+# ✔ STS Ready
+# ✔ Docker Ready
+# ✔ Kubernetes Ready
+# ✔ AWS EKS Ready
+# ✔ Spring Cloud Config Ready
+#
+# The application code and Docker image remain unchanged
+# across all deployment environments.
+#
+# Only environment variables differ.
+#
+# =============================================================================
+
+spring:
+
+  kafka:
+
+    # =========================================================================
+    # Kafka Bootstrap Server
+    # =========================================================================
+    #
+    # The Kafka bootstrap server is dynamically constructed using
+    # environment variables.
+    #
+    # Default values support Spring Tool Suite (STS).
+    #
+    # Docker Compose, Kubernetes and AWS override these values
+    # using environment variables, ConfigMaps or Secrets.
+    #
+    # =========================================================================
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:29092}
+
+    # =========================================================================
+    # Producer Configuration
+    # =========================================================================
+
+    producer:
+
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      acks: all
+
+      retries: 3
+
+      properties:
+
+        spring.json.add.type.headers: false
+
+    # =========================================================================
+    # Consumer Configuration
+    # =========================================================================
+
+    consumer:
+
+      group-id: default-wallet-group
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      enable-auto-commit: false
+
+      auto-offset-reset: earliest
+
+      # -----------------------------------------------------------------------
+      # MSIMPL Standard
+      # -----------------------------------------------------------------------
+      #
+      # DO NOT USE JsonDeserializer.
+      #
+      # Consumer messages are received as raw JSON and are
+      # manually converted using Jackson ObjectMapper.
+      #
+      # This provides complete control over deserialization,
+      # version compatibility and error handling.
+      #
+      # -----------------------------------------------------------------------
+
+# =============================================================================
+# Wallet Topic Configuration
+# =============================================================================
+
+wallet:
+
+  topic:
+
+    request: wallet-request-topic
+
+    response: wallet-response-topic
+
+    compensation: wallet-compensation-topic
+
+  consumer:
+
+    group-id: wallet-consumer-group
+
+# =============================================================================
+# End Of File
+# =============================================================================

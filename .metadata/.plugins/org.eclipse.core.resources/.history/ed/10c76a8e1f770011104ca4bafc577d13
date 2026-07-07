@@ -1,0 +1,130 @@
+# =============================================================================
+# File Name   : docker-compose.yml
+# Module      : Docker Infrastructure
+# Environment : Docker
+# Project     : Microservices Platform (MSIMPL)
+# Author      : Sanjeev Kumar
+# Created On  : 04-Jul-2026
+# =============================================================================
+#
+# Description
+# -----------
+# Docker infrastructure for the MSIMPL project.
+#
+# Components
+# ----------
+# 1. Apache Kafka (KRaft Mode)
+# 2. Kafka UI
+#
+# Notes
+# -----
+# PostgreSQL is installed on the Windows host and is not part of this
+# Docker infrastructure.
+#
+# =============================================================================
+
+services:
+
+  # ===========================================================================
+  # Apache Kafka (KRaft Mode)
+  # ===========================================================================
+
+  kafka:
+
+    image: ${KAFKA_IMAGE_NAME}:${KAFKA_IMAGE_VERSION}
+
+    container_name: ${KAFKA_CONTAINER_NAME}
+
+    hostname: ${KAFKA_HOSTNAME}
+
+    restart: ${KAFKA_RESTART}
+
+    ports:
+      - "${KAFKA_EXTERNAL_PORT}:${KAFKA_INTERNAL_PORT}"
+
+    environment:
+
+      KAFKA_NODE_ID: ${KAFKA_NODE_ID}
+
+      KAFKA_PROCESS_ROLES: ${KAFKA_PROCESS_ROLES}
+
+      KAFKA_CLUSTER_ID: ${KAFKA_CLUSTER_ID}
+
+      KAFKA_CONTROLLER_QUORUM_VOTERS: ${KAFKA_CONTROLLER_QUORUM}
+
+      KAFKA_LISTENERS: ${KAFKA_LISTENERS}
+
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+
+      KAFKA_CONTROLLER_LISTENER_NAMES: ${KAFKA_CONTROLLER_LISTENER_NAMES}
+
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${KAFKA_INTER_BROKER_LISTENER_NAME}
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+
+      KAFKA_LOG_DIRS: ${KAFKA_LOG_DIRS}
+
+      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS}
+
+      KAFKA_LOG4J_ROOT_LOGLEVEL: ${KAFKA_LOG_LEVEL}
+
+    volumes:
+      - kafka-data:${KAFKA_LOG_DIRS}
+
+    networks:
+      - msimpl-network
+
+
+  # ===========================================================================
+  # Kafka UI
+  # ===========================================================================
+
+  kafka-ui:
+
+    image: provectuslabs/kafka-ui:latest
+
+    container_name: kafka-ui
+
+    hostname: kafka-ui
+
+    restart: unless-stopped
+
+    depends_on:
+      - kafka
+
+    ports:
+      - "8080:8080"
+
+    environment:
+
+      KAFKA_CLUSTERS_0_NAME: MSIMPL
+
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+      DYNAMIC_CONFIG_ENABLED: "true"
+
+    networks:
+      - msimpl-network
+
+
+# =============================================================================
+# Docker Volumes
+# =============================================================================
+
+volumes:
+
+  kafka-data:
+    name: kafka-data
+
+
+# =============================================================================
+# Docker Networks
+# =============================================================================
+
+networks:
+
+  msimpl-network:
+
+    name: msimpl-network
+
+    driver: bridge

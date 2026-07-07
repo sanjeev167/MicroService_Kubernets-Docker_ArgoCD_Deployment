@@ -1,0 +1,170 @@
+# =============================================================================
+# File Name   : docker-compose.yml
+# Module      : Docker Infrastructure
+# Environment : Docker
+# Project     : Microservices Platform (MSIMPL)
+# Author      : Sanjeev Kumar
+# Created On  : 04-Jul-2026
+# =============================================================================
+#
+# Description
+# -----------
+# This Docker Compose file provisions the infrastructure components required
+# by the MSIMPL microservices in the Docker environment.
+#
+# Infrastructure Components
+# -------------------------
+# 1. Apache Kafka (KRaft Mode)
+# 2. Kafka UI
+#
+# Notes
+# -----
+# 1. PostgreSQL is installed on the Windows host and is NOT deployed as a
+#    Docker container.
+#
+# 2. All infrastructure configuration is externalized into dedicated
+#    environment files located under:
+#
+#       infrastructure/env/
+#
+# 3. Docker creates the required network and persistent volumes
+#    automatically during deployment.
+#
+# 4. This infrastructure must be started before deploying any
+#    MSIMPL microservice containers.
+#
+# =============================================================================
+
+services:
+
+  # ===========================================================================
+  # Apache Kafka
+  # ===========================================================================
+  #
+  # Purpose
+  # -------
+  # Provides the event streaming platform used by all MSIMPL
+  # microservices.
+  #
+  # Mode
+  # ----
+  # KRaft (ZooKeeper-less)
+  #
+  # ===========================================================================
+
+  kafka:
+
+    image: ${KAFKA_IMAGE_NAME}:${KAFKA_IMAGE_VERSION}
+
+    container_name: ${KAFKA_CONTAINER_NAME}
+
+    hostname: ${KAFKA_HOSTNAME}
+
+    restart: ${KAFKA_RESTART}
+
+    env_file:
+      - ./env/kafka.env
+
+    ports:
+      - "${KAFKA_EXTERNAL_PORT}:${KAFKA_INTERNAL_PORT}"
+
+    environment:
+
+      KAFKA_NODE_ID: ${KAFKA_NODE_ID}
+
+      KAFKA_PROCESS_ROLES: ${KAFKA_PROCESS_ROLES}
+
+      KAFKA_CLUSTER_ID: ${KAFKA_CLUSTER_ID}
+
+      KAFKA_CONTROLLER_QUORUM_VOTERS: ${KAFKA_CONTROLLER_QUORUM}
+
+      KAFKA_LISTENERS: ${KAFKA_LISTENERS}
+
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+
+      KAFKA_CONTROLLER_LISTENER_NAMES: ${KAFKA_CONTROLLER_LISTENER_NAMES}
+
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${KAFKA_INTER_BROKER_LISTENER_NAME}
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+
+      KAFKA_LOG_DIRS: ${KAFKA_LOG_DIRS}
+
+      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS}
+
+      KAFKA_LOG4J_ROOT_LOGLEVEL: ${KAFKA_LOG_LEVEL}
+
+    volumes:
+      - kafka-data:${KAFKA_LOG_DIRS}
+
+    networks:
+      - msimpl-network
+
+
+
+  # ===========================================================================
+  # Kafka UI
+  # ===========================================================================
+  #
+  # Purpose
+  # -------
+  # Web-based administration console used to monitor Kafka clusters,
+  # topics, partitions, consumer groups and published messages.
+  #
+  # ===========================================================================
+
+  kafka-ui:
+
+    image: ${KAFKA_UI_IMAGE_NAME}:${KAFKA_UI_IMAGE_VERSION}
+
+    container_name: ${KAFKA_UI_CONTAINER_NAME}
+
+    hostname: ${KAFKA_UI_HOSTNAME}
+
+    restart: ${KAFKA_UI_RESTART}
+
+    env_file:
+      - ./env/kafka-ui.env
+
+    depends_on:
+      - kafka
+
+    ports:
+      - "${KAFKA_UI_PORT}:8080"
+
+    environment:
+
+      KAFKA_CLUSTERS_0_NAME: ${KAFKA_CLUSTER_NAME}
+
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${KAFKA_BOOTSTRAP_SERVER}
+
+      DYNAMIC_CONFIG_ENABLED: ${KAFKA_UI_DYNAMIC_CONFIG_ENABLED}
+
+    networks:
+      - msimpl-network
+
+
+
+# =============================================================================
+# Persistent Docker Volumes
+# =============================================================================
+
+volumes:
+
+  kafka-data:
+
+    name: kafka-data
+
+
+
+# =============================================================================
+# Docker Networks
+# =============================================================================
+
+networks:
+
+  msimpl-network:
+
+    name: msimpl-network
+
+    driver: bridge

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ms-wallet
+  namespace: msimpl
+  labels:
+    app: ms-wallet
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ms-wallet
+
+  template:
+    metadata:
+      labels:
+        app: ms-wallet

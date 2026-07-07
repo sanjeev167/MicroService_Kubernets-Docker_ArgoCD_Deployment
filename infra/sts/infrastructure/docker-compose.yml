@@ -1,0 +1,99 @@
+version: "3.8"
+
+services:
+
+  # ==========================================================
+  # APACHE KAFKA (KRaft Mode)
+  # ==========================================================
+  #
+  # Provides the messaging infrastructure for Spring Boot
+  # microservices running directly from STS.
+  #
+  kafka:
+
+    image: confluentinc/cp-kafka:7.5.0
+
+    container_name: kafka
+
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+
+    # --------------------------------------------------------
+    # Environment Variables
+    # --------------------------------------------------------
+    #
+    # All Kafka runtime configuration is centralized in:
+    #
+    #     env/kafka.env
+    #
+    # The Confluent Kafka image reads these variables
+    # directly during container startup.
+    #
+    env_file:
+      - ./env/kafka.env
+
+    environment:
+
+      # ------------------------------------------------------
+      # Static Kafka Configuration
+      # ------------------------------------------------------
+      #
+      # These values remain constant across environments.
+      #
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+    networks:
+      - infra_msimpl-network
+
+    restart: unless-stopped
+
+
+  # ==========================================================
+  # KAFKA UI
+  # ==========================================================
+  #
+  # Web interface for monitoring and managing the Kafka
+  # broker used by Spring Boot applications running from STS.
+  #
+  kafka-ui:
+
+    image: provectuslabs/kafka-ui
+
+    container_name: kafka-ui
+
+    ports:
+      - "8085:8080"
+
+    environment:
+      KAFKA_CLUSTERS_0_NAME: Local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+    depends_on:
+      - kafka
+
+    networks:
+      - infra_msimpl-network
+
+    restart: unless-stopped
+
+
+# ==========================================================
+# NETWORK CONFIGURATION
+# ==========================================================
+#
+# External Docker bridge network shared by all infrastructure
+# containers used during STS-based development.
+#
+# ==========================================================
+
+networks:
+
+  infra_msimpl-network:
+    external: true

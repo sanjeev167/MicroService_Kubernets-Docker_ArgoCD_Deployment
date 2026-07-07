@@ -1,0 +1,121 @@
+# =============================================================================
+# MSIMPL Kubernetes Deployment – Phase 6
+# Topic       : Ingress & External Access
+# File        : Ingress-Guide.md
+# Author      : Sanjeev Kumar
+# Description : Installation and configuration of NGINX Ingress Controller
+#               using Helm and creation of a common Ingress resource for
+#               MSIMPL microservices.
+# =============================================================================
+
+# =============================================================================
+# OBJECTIVE
+# =============================================================================
+# In previous phases, all microservices were deployed successfully inside
+# the Kubernetes cluster using ClusterIP Services.
+# ClusterIP Services can communicate internally via CoreDNS,
+# but they cannot be accessed directly from outside the cluster.
+#
+# Goals of this phase:
+# • Install NGINX Ingress Controller using Helm.
+# • Configure a common Ingress for all microservices.
+# • Expose services to external clients (Postman/Browser).
+# • Prepare the project for future Spring Cloud Gateway integration.
+# =============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: msimpl-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /orchestrator
+        pathType: Prefix
+        backend:
+          service:
+            name: ms-transaction-orchestrator
+            port:
+              number: 8082
+      - path: /wallet
+        pathType: Prefix
+        backend:
+          service:
+            name: ms-wallet
+            port:
+              number: 8080
+      - path: /notification
+        pathType: Prefix
+        backend:
+          service:
+            name: ms-notification
+            port:
+              number: 8081
+
+# =============================================================================
+# NOTES
+# =============================================================================
+# Ingress never communicates directly with Pods.
+# It forwards requests to a Kubernetes Service,
+# which then routes to one of the available Pods.
+#
+# Routes configured:
+# /orchestrator  -> ms-transaction-orchestrator
+# /wallet        -> ms-wallet
+# /notification  -> ms-notification
+#
+# =============================================================================
+# HOST CONFIGURATION
+# =============================================================================
+#
+# Local Development
+# -----------------
+#
+# Host: localhost
+#
+# No changes are required to the Windows hosts file because
+# localhost is already mapped to 127.0.0.1 by Windows.
+#
+# Docker Desktop exposes the NGINX Ingress Controller using localhost.
+#
+# Production
+# ----------
+#
+# Replace localhost with your actual domain
+# (for example, api.company.com) and configure DNS accordingly.
+#
+# =============================================================================
+# Add "127.0.0.1 localhost" to C:\Windows\System32\drivers\etc\hosts
+# =============================================================================
+
+# =============================================================================
+# PROJECT STRUCTURE
+# =============================================================================
+# kubernetes/
+# ├── namespace.yaml
+# ├── ingress.yaml
+# ├── ms-wallet/
+# │      deployment.yaml
+# │      service.yaml
+# ├── ms-notification/
+# │      deployment.yaml
+# │      service.yaml
+# └── ms-transaction-orchestrator/
+#        deployment.yaml
+#        service.yaml
+# =============================================================================
+
+# =============================================================================
+# NEXT PHASE
+# =============================================================================
+# 1. Apply the common ingress.yaml.
+# 2. Verify the Ingress resource.
+# 3. Configure the Windows hosts file.
+# 4. Test all three microservices using Postman.
+# 5. Begin Argo CD installation and GitOps deployment.
+# =============================================================================

@@ -1,0 +1,283 @@
+# ==========================================================
+# BOOTSTRAP CONFIGURATION
+# ==========================================================
+# Service   : ms-wallet
+# File      : application.yml
+# Author    : Sanjeev Kumar
+# Date      : 01-July-2026
+#
+# ==========================================================
+# PURPOSE
+# ----------------------------------------------------------
+# This is the primary bootstrap configuration file for the
+# ms-wallet microservice.
+#
+# Its responsibility is intentionally limited to:
+#
+#   ✔ Service Identification
+#   ✔ Server Configuration
+#   ✔ Importing Modular Configuration Files
+#   ✔ Core JPA/Hibernate Configuration
+#
+# All infrastructure-specific configurations are delegated
+# to dedicated configuration files.
+#
+# This keeps the application bootstrap clean, readable and
+# environment independent.
+#
+# ==========================================================
+# CONFIGURATION ARCHITECTURE
+# ----------------------------------------------------------
+#
+#                    application.yml
+#                           │
+#        ┌──────────────────┼──────────────────┐
+#        │                  │                  │
+#        ▼                  ▼                  ▼
+# application-db.yml   application-kafka.yml  application-observability.yml
+#        │                  │                  │
+#        ▼                  ▼                  ▼
+#   Database           Event Streaming      Monitoring
+#
+#
+# Future Modules
+# --------------
+#
+# application-redis.yml
+# application-security.yml
+# application-service.yml
+#
+# Each module has a single responsibility and can evolve
+# independently without affecting the bootstrap file.
+#
+# ==========================================================
+# DESIGN PRINCIPLES
+# ----------------------------------------------------------
+# ✔ Single Responsibility
+#     Each configuration file manages one concern.
+#
+# ✔ Separation of Concerns
+#     Business configuration and infrastructure
+#     configuration remain independent.
+#
+# ✔ Environment Independence
+#     No environment-specific values are hardcoded here.
+#     Values should be supplied through Environment
+#     Variables with sensible defaults inside each module.
+#
+# ✔ Cloud Ready
+#     Compatible with:
+#       • Local STS Development
+#       • Docker
+#       • Kubernetes
+#       • AWS ECS / EKS
+#       • Future Spring Cloud Config Server
+#
+# ✔ Maintainability
+#     Small focused configuration files are easier to
+#     understand, review and maintain.
+#
+# ==========================================================
+# MODULE RESPONSIBILITIES
+# ----------------------------------------------------------
+#
+# application-db.yml
+# ------------------
+# • Database URL
+# • Driver
+# • Username / Password
+# • Connection Pool
+#
+#
+# application-kafka.yml
+# ---------------------
+# • Kafka Brokers
+# • Producer Configuration
+# • Consumer Configuration
+# • Topics
+#
+#
+# application-observability.yml
+# -----------------------------
+# • Spring Boot Actuator
+# • Prometheus Metrics
+# • Health Endpoint
+# • Monitoring Configuration
+#
+#
+# application-redis.yml (Future)
+# ------------------------------
+# • Redis Connection
+# • Cache Configuration
+#
+#
+# application-security.yml (Future)
+# ---------------------------------
+# • JWT
+# • Authentication
+# • Authorization
+#
+#
+# application-service.yml (Future)
+# --------------------------------
+# • External Service URLs
+# • Timeouts
+# • Retry Configuration
+#
+# ==========================================================
+
+server:
+
+  # ========================================================
+  # APPLICATION SERVER
+  # ========================================================
+  #
+  # HTTP port used by the microservice.
+  #
+  # Local Development:
+  #     localhost:8080
+  #
+  # Docker/Kubernetes:
+  #     Can be overridden using environment variables
+  #     or deployment configuration.
+  #
+  port: 8080
+
+
+spring:
+
+  # ========================================================
+  # APPLICATION INFORMATION
+  # ========================================================
+  #
+  # Logical service name.
+  #
+  # Used by:
+  #
+  # • Spring Boot
+  # • Logging
+  # • Prometheus Metric Tags
+  # • Grafana Dashboards
+  # • Future Service Discovery
+  #
+  application:
+    name: ms-wallet
+
+
+  # ========================================================
+  # MODULAR CONFIGURATION IMPORT
+  # ========================================================
+  #
+  # Imports dedicated configuration modules.
+  #
+  # Spring Boot merges these files into one unified
+  # application configuration during startup.
+  #
+  # Benefits:
+  #
+  # ✔ Better organization
+  # ✔ Easier maintenance
+  # ✔ Environment-specific overrides
+  # ✔ Cleaner code reviews
+  #
+  config:
+
+    import:
+
+      # ----------------------------------------------------
+      # Database Configuration
+      # ----------------------------------------------------
+      - classpath:config/application-db.yml
+
+      # ----------------------------------------------------
+      # Kafka Configuration
+      # ----------------------------------------------------
+      - classpath:config/application-kafka.yml
+
+      # ----------------------------------------------------
+      # Monitoring & Observability
+      # ----------------------------------------------------
+      - classpath:config/application-observability.yml
+
+      # ----------------------------------------------------
+      # Future Modules
+      # ----------------------------------------------------
+      # - classpath:config/application-redis.yml
+      # - classpath:config/application-security.yml
+      # - classpath:config/application-service.yml
+
+
+  # ========================================================
+  # JPA / HIBERNATE CONFIGURATION
+  # ========================================================
+  #
+  # Only core persistence settings are maintained here.
+  #
+  # Database connection properties are defined in:
+  #
+  #     application-db.yml
+  #
+  jpa:
+
+    hibernate:
+
+      # ----------------------------------------------------
+      # Schema Generation Strategy
+      # ----------------------------------------------------
+      #
+      # Development:
+      #     update
+      #
+      # Production:
+      #     validate
+      #
+      ddl-auto: update
+
+    # ------------------------------------------------------
+    # SQL Logging
+    # ------------------------------------------------------
+    #
+    # Development:
+    #     Enabled
+    #
+    # Production:
+    #     Disable for performance and security.
+    #
+    show-sql: true
+
+
+# ==========================================================
+# DEPLOYMENT STRATEGY
+# ----------------------------------------------------------
+#
+# Local Development
+# -----------------
+# • Run from STS
+# • Uses default values defined in modular YAML files.
+#
+#
+# Docker
+# -------
+# • Same JAR
+# • Same configuration
+# • Environment variables override default values.
+#
+#
+# Kubernetes
+# ----------
+# • Same Docker Image
+# • Same application code
+# • Configuration supplied through:
+#     ConfigMaps
+#     Secrets
+#     Environment Variables
+#
+#
+# AWS
+# ---
+# • Same deployment model
+# • No application rebuild required.
+#
+# ==========================================================
+# END OF FILE
+# ==========================================================

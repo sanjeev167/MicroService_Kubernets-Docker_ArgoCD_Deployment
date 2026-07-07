@@ -1,0 +1,130 @@
+# ==========================================================
+# MSIMPL Kubernetes Deployment
+# File      : deployment.yaml
+# Service   : ms-wallet
+# Namespace : msimpl
+# Author    : Sanjeev Kumar
+#
+# Description
+# -----------
+# Deploys the Wallet Microservice into the MSIMPL Kubernetes
+# cluster.
+#
+# Features
+# --------
+# - Single replica deployment
+# - Uses local Docker image (Development)
+# - Externalized configuration through ConfigMaps
+# - Sensitive configuration through Secret
+# - Resource Requests & Limits
+# - Startup, Readiness and Liveness Probes
+#
+# Notes
+# -----
+# This deployment is optimized for:
+# - Local Kubernetes Cluster
+# - 8 GB RAM Development Machine
+# - Docker Desktop
+# - Kafka
+# - PostgreSQL
+# - Prometheus
+# - Grafana
+# - Loki
+# - Promtail
+#
+# The same deployment can later be migrated to AWS EKS by
+# changing only the Docker image reference.
+#
+# ==========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ms-wallet
+  namespace: msimpl
+
+  labels:
+    app: ms-wallet
+
+spec:
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ms-wallet
+
+  template:
+
+    metadata:
+      labels:
+        app: ms-wallet
+
+    spec:
+
+      containers:
+
+        - name: ms-wallet
+
+          image: ms-wallet:1.0
+
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8080
+
+          envFrom:
+
+            - configMapRef:
+                name: msimpl-common-config
+
+            - configMapRef:
+                name: ms-wallet-db-config
+
+            - configMapRef:
+                name: msimpl-kafka-config
+
+            - configMapRef:
+                name: msimpl-observability-config
+
+            - secretRef:
+                name: msimpl-secret
+
+          resources:
+
+            requests:
+              cpu: "200m"
+              memory: "384Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "768Mi"
+
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3

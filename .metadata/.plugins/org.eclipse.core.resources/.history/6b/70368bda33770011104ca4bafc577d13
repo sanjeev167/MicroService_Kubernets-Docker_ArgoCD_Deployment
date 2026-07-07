@@ -1,0 +1,42 @@
+# ==========================================================
+# FILE             : wallet.env
+# MODULE           : Wallet Docker Environment
+# PROJECT          : MSIMPL
+# ENVIRONMENT      : Docker
+# AUTHOR           : Sanjeev Kumar
+# CREATED ON       : 04-Jul-2026
+# VERSION          : 1.0.0
+# ==========================================================
+
+# ==========================================================
+# Docker Image
+# ==========================================================
+
+WALLET_IMAGE_NAME=ms-wallet
+
+WALLET_IMAGE_VERSION=1.0
+
+
+# ==========================================================
+# Container Configuration
+# ==========================================================
+
+WALLET_CONTAINER_NAME=ms-wallet
+
+WALLET_HOSTNAME=ms-wallet
+
+WALLET_RESTART=unless-stopped
+
+
+# ==========================================================
+# Port Configuration
+# ==========================================================
+
+WALLET_PORT=8080
+
+
+# ==========================================================
+# JVM Configuration
+# ==========================================================
+
+WALLET_JAVA_OPTS=-Xms256m -Xmx512m

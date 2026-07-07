@@ -1,0 +1,30 @@
+2026-07-03 23:16:33.251 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - Starting MsNotificationApplication using Java 17.0.10 with PID 7316 (F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification\target\classes started by conta in F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification)
+2026-07-03 23:16:33.257 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - No active profile set, falling back to 1 default profile: "default"
+2026-07-03 23:16:36.173 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Initializing ProtocolHandler ["http-nio-8081"]
+2026-07-03 23:16:36.176 [restartedMain] INFO  o.a.catalina.core.StandardService [service=ms-notification] [traceId=] [txnId=] - Starting service [Tomcat]
+2026-07-03 23:16:36.176 [restartedMain] INFO  o.a.catalina.core.StandardEngine [service=ms-notification] [traceId=] [txnId=] - Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-07-03 23:16:36.269 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-notification] [traceId=] [txnId=] - Initializing Spring embedded WebApplicationContext
+2026-07-03 23:16:36.581 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Starting...
+2026-07-03 23:16:36.843 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@50ac3b03
+2026-07-03 23:16:36.846 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Start completed.
+2026-07-03 23:16:36.938 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper [service=ms-notification] [traceId=] [txnId=] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-03 23:16:37.066 [restartedMain] INFO  org.hibernate.Version [service=ms-notification] [traceId=] [txnId=] - HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-07-03 23:16:37.123 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000026: Second-level cache disabled
+2026-07-03 23:16:38.120 [restartedMain] WARN  org.hibernate.orm.deprecation [service=ms-notification] [traceId=] [txnId=] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-03 23:16:38.168 [restartedMain] INFO  o.hibernate.orm.connections.pooling [service=ms-notification] [traceId=] [txnId=] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-03 23:16:39.767 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-03 23:16:41.376 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [service=ms-notification] [traceId=] [txnId=] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-03 23:16:42.822 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Starting ProtocolHandler ["http-nio-8081"]
+2026-07-03 23:16:43.220 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - Started MsNotificationApplication in 11.098 seconds (process running for 12.448)
+2026-07-03 23:16:44.067 [RMI TCP Connection(6)-127.0.0.1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-notification] [traceId=] [txnId=] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-03 23:27:41.530 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.n.k.c.NotificationRequestConsumer [service=ms-notification] [traceId=c905c11c-12b6-4969-94ac-d7f2ba741c1f] [txnId=] - 📥 Received NotificationRequestEvent
+2026-07-03 23:27:42.620 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.n.service.NotificationService [service=ms-notification] [traceId=c905c11c-12b6-4969-94ac-d7f2ba741c1f] [txnId=] - Processing notification | txnId=c746bbc2-73a5-4c8a-9b84-38a19979df13 | message=Wallet transaction successful
+2026-07-03 23:27:42.786 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.n.k.p.NotificationResponseProducer [service=ms-notification] [traceId=c905c11c-12b6-4969-94ac-d7f2ba741c1f] [txnId=] - 📤 SENDING NOTIFICATION RESPONSE | topic=notification-response-topic | txnId=c746bbc2-73a5-4c8a-9b84-38a19979df13 | status=COMPLETED
+2026-07-03 23:27:43.065 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  c.n.k.c.NotificationRequestConsumer [service=ms-notification] [traceId=c905c11c-12b6-4969-94ac-d7f2ba741c1f] [txnId=] - ✅ Notification processed SUCCESS | txnId=c746bbc2-73a5-4c8a-9b84-38a19979df13

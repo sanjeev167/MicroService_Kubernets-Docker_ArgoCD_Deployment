@@ -1,0 +1,11 @@
+db:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notification_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+    pool:
+      max-size: 10
+      min-idle: 2
+      idle-timeout: 30000

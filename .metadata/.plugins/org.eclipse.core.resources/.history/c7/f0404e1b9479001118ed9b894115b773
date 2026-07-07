@@ -1,0 +1,54 @@
+# =============================================================================
+# File        : ingress.yaml
+# Description : Common Ingress configuration for MSIMPL microservices
+# Author      : Sanjeev Kumar
+# =============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: msimpl-ingress
+  namespace: msimpl
+
+spec:
+  ingressClassName: nginx
+
+  rules:
+    - host: msimpl.local
+
+      http:
+        paths:
+
+          # ---------------------------------------------------------
+          # Transaction Orchestrator
+          # ---------------------------------------------------------
+          - path: /orchestrator
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-transaction-orchestrator
+                port:
+                  number: 8082
+
+          # ---------------------------------------------------------
+          # Wallet Service
+          # ---------------------------------------------------------
+          - path: /wallet
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-wallet
+                port:
+                  number: 8080
+
+          # ---------------------------------------------------------
+          # Notification Service
+          # ---------------------------------------------------------
+          - path: /notification
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-notification
+                port:
+                  number: 8081

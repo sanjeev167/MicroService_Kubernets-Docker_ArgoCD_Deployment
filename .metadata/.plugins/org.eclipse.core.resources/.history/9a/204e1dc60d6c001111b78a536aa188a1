@@ -1,0 +1,88 @@
+# ==========================================================
+# DOCKER COMPOSE CONFIGURATION (LOGGING STACK)
+# ==========================================================
+# Author: Sanjeev
+# Date: 19-June-2026
+# Version: 3.8
+#
+# PURPOSE:
+# * Centralized logging infrastructure using Loki + Promtail
+# * Collect logs from microservices and make them queryable
+# * Integrate with Grafana for visualization and tracing
+#
+# COMPONENTS:
+# ----------------------------------------------------------
+# Loki     → Log storage + query engine
+# Promtail → Log collector + shipper (like Filebeat)
+#
+# LOG FLOW:
+# ----------------------------------------------------------
+# Microservices → logs/*.log → Promtail → Loki → Grafana
+#
+# DESIGN PRINCIPLES:
+# ✔ Lightweight logging stack
+# ✔ No log parsing at service level (raw logs)
+# ✔ Centralized log ingestion
+# ✔ Easy integration with Grafana
+# ==========================================================
+
+version: '3.8'
+
+services:
+
+  # ==========================================================
+  # 🟣 LOKI (Log Storage & Query Engine)
+  # ==========================================================
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: loki
+    ports:
+      - "3100:3100"   # Loki API endpoint → http://localhost:3100
+    # ------------------------------------------------------
+    # Default Loki configuration file
+    # ------------------------------------------------------
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: always
+
+  # ==========================================================
+  # 🟡 PROMTAIL (Log Collector & Forwarder)
+  # ==========================================================
+  promtail:
+    image: grafana/promtail:2.9.2
+    container_name: promtail
+    volumes:
+      # ------------------------------------------------------
+      # Log directory mapping
+      # Local logs folder → container path
+      # ------------------------------------------------------
+      - ../logs:/var/log/app
+
+      # ------------------------------------------------------
+      # Promtail configuration file
+      # ------------------------------------------------------
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    # ------------------------------------------------------
+    # Promtail config file location
+    # ------------------------------------------------------
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    restart: always
+
+# ==========================================================
+# NOTES:
+# ==========================================================
+# ✔ Loki does NOT collect logs by itself
+# ✔ Promtail reads log files and pushes them to Loki
+# ✔ Grafana queries Loki for visualization
+#
+# ✔ Ensure:
+#   - logs folder exists at project root
+#   - services write logs into logs/*.log
+#
+# ✔ Verify Loki:
+#   http://localhost:3100/ready
+#
+# ✔ Verify Logs in Grafana:
+#   Explore → Loki → {job="msimpl"}
+# ==========================================================

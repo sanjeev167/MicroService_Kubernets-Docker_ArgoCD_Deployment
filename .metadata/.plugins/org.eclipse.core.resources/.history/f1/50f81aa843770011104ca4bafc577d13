@@ -1,0 +1,52 @@
+2026-06-30 18:16:42.942 [main] INFO  com.wallet.MsWalletApplicationTests [service=ms-wallet] [traceId=] [txnId=] - Starting MsWalletApplicationTests using Java 17.0.10 with PID 1072 (started by conta in F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-wallet)
+2026-06-30 18:16:42.970 [main] INFO  com.wallet.MsWalletApplicationTests [service=ms-wallet] [traceId=] [txnId=] - No active profile set, falling back to 1 default profile: "default"
+2026-06-30 18:16:51.186 [main] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Starting...
+2026-06-30 18:16:52.946 [main] INFO  com.zaxxer.hikari.pool.HikariPool [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@63c99f7
+2026-06-30 18:16:52.952 [main] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Start completed.
+2026-06-30 18:16:53.534 [main] INFO  o.h.jpa.internal.util.LogHelper [service=ms-wallet] [traceId=] [txnId=] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-30 18:16:53.970 [main] INFO  org.hibernate.Version [service=ms-wallet] [traceId=] [txnId=] - HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-06-30 18:16:54.212 [main] INFO  o.h.c.i.RegionFactoryInitiator [service=ms-wallet] [traceId=] [txnId=] - HHH000026: Second-level cache disabled
+2026-06-30 18:16:56.380 [main] WARN  org.hibernate.orm.deprecation [service=ms-wallet] [traceId=] [txnId=] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-30 18:16:56.572 [main] INFO  o.hibernate.orm.connections.pooling [service=ms-wallet] [traceId=] [txnId=] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-30 18:17:00.735 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [service=ms-wallet] [traceId=] [txnId=] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-30 18:17:08.619 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [service=ms-wallet] [traceId=] [txnId=] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-30 18:17:15.123 [main] INFO  com.wallet.MsWalletApplicationTests [service=ms-wallet] [traceId=] [txnId=] - Started MsWalletApplicationTests in 35.17 seconds (process running for 42.28)
+2026-06-30 18:17:19.178 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Shutdown initiated...
+2026-06-30 18:17:19.193 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Shutdown completed.
+2026-06-30 18:17:59.350 [main] INFO  com.wallet.MsWalletApplication [service=ms-wallet] [traceId=] [txnId=] - Starting MsWalletApplication using Java 17.0.10 with PID 860 (F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-wallet\target\classes started by conta in F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-wallet)
+2026-06-30 18:17:59.368 [main] INFO  com.wallet.MsWalletApplication [service=ms-wallet] [traceId=] [txnId=] - No active profile set, falling back to 1 default profile: "default"
+2026-06-30 18:18:05.659 [main] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-wallet] [traceId=] [txnId=] - Initializing ProtocolHandler ["http-nio-8080"]
+2026-06-30 18:18:05.673 [main] INFO  o.a.catalina.core.StandardService [service=ms-wallet] [traceId=] [txnId=] - Starting service [Tomcat]
+2026-06-30 18:18:05.675 [main] INFO  o.a.catalina.core.StandardEngine [service=ms-wallet] [traceId=] [txnId=] - Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-06-30 18:18:06.013 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-wallet] [traceId=] [txnId=] - Initializing Spring embedded WebApplicationContext
+2026-06-30 18:18:06.692 [main] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Starting...
+2026-06-30 18:18:07.372 [main] INFO  com.zaxxer.hikari.pool.HikariPool [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6d3ad37a
+2026-06-30 18:18:07.378 [main] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Start completed.
+2026-06-30 18:18:07.537 [main] INFO  o.h.jpa.internal.util.LogHelper [service=ms-wallet] [traceId=] [txnId=] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-30 18:18:07.826 [main] INFO  org.hibernate.Version [service=ms-wallet] [traceId=] [txnId=] - HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-06-30 18:18:08.051 [main] INFO  o.h.c.i.RegionFactoryInitiator [service=ms-wallet] [traceId=] [txnId=] - HHH000026: Second-level cache disabled
+2026-06-30 18:18:09.693 [main] WARN  org.hibernate.orm.deprecation [service=ms-wallet] [traceId=] [txnId=] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-30 18:18:09.786 [main] INFO  o.hibernate.orm.connections.pooling [service=ms-wallet] [traceId=] [txnId=] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-30 18:18:12.516 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [service=ms-wallet] [traceId=] [txnId=] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-30 18:18:15.247 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [service=ms-wallet] [traceId=] [txnId=] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-30 18:18:17.997 [main] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-wallet] [traceId=] [txnId=] - Starting ProtocolHandler ["http-nio-8080"]
+2026-06-30 18:18:18.826 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-wallet] [traceId=] [txnId=] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-30 18:18:19.458 [main] INFO  com.wallet.MsWalletApplication [service=ms-wallet] [traceId=] [txnId=] - Started MsWalletApplication in 22.617 seconds (process running for 25.55)
+2026-06-30 18:18:36.765 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-wallet] [traceId=] [txnId=] - Pausing ProtocolHandler ["http-nio-8080"]
+2026-06-30 18:18:36.953 [RMI TCP Connection(9)-127.0.0.1] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-wallet] [traceId=] [txnId=] - Stopping ProtocolHandler ["http-nio-8080"]
+2026-06-30 18:18:36.980 [RMI TCP Connection(9)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Shutdown initiated...
+2026-06-30 18:18:37.003 [RMI TCP Connection(9)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Shutdown completed.

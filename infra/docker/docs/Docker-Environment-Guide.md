@@ -1,0 +1,355 @@
+# Docker Environment Guide
+
+## MSIMPL - Microservices Platform
+
+**Version:** 1.0.0\
+**Author:** Sanjeev Kumar\
+**Created On:** 04-Jul-2026\
+**Last Modified:** 04-Jul-2026
+
+------------------------------------------------------------------------
+
+# 1. Introduction
+
+This document describes the **Docker deployment environment** for the
+MSIMPL (Microservices Platform).
+
+Unlike the STS environment where Spring Boot applications run directly
+from Spring Tool Suite, the Docker environment runs the application
+microservices as Docker containers while sharing common infrastructure
+and observability services through Docker Compose.
+
+The objective is to validate the complete containerized deployment
+before moving to Kubernetes.
+
+------------------------------------------------------------------------
+
+# 2. Objectives
+
+-   Deploy Spring Boot microservices as Docker containers.
+-   Use a shared Docker network for service-to-service communication.
+-   Externalize configuration using environment variables.
+-   Centralize application logs.
+-   Centralize metrics collection.
+-   Prepare the same Docker images for Kubernetes deployment.
+-   Avoid application code changes between Docker and Kubernetes.
+
+------------------------------------------------------------------------
+
+# 3. Deployment Architecture
+
+                       Docker Environment
+
+    +---------------------------------------------------------+
+    |                  Docker Engine                          |
+    |                                                         |
+    |  Infrastructure                                         |
+    |    • Kafka                                              |
+    |    • Kafka UI                                           |
+    |                                                         |
+    |  Applications                                           |
+    |    • ms-auth-server                                     |
+    |    • ms-user                                            |
+    |    • ms-wallet                                          |
+    |    • ms-notification                                    |
+    |    • ms-transaction-orchestrator                        |
+    |                                                         |
+    |  Observability                                          |
+    |    • Prometheus                                         |
+    |    • Grafana                                            |
+    |    • Loki                                               |
+    |    • Promtail                                           |
+    +---------------------------------------------------------+
+
+    PostgreSQL continues to run on the host machine.
+
+------------------------------------------------------------------------
+
+# 4. Docker Modules
+
+## Infrastructure
+
+-   Kafka
+-   Kafka UI
+
+Location:
+
+    infra/docker/infrastructure
+
+## Applications
+
+-   Spring Boot microservices
+-   Docker images
+-   Docker Compose
+
+Location:
+
+    infra/docker/applications
+
+## Observability
+
+-   Prometheus
+-   Grafana
+-   Loki
+-   Promtail
+
+Location:
+
+    infra/docker/observability
+    
+Host Services
+-------------
+PostgreSQL
+
+------------------------------------------------------------------------
+
+# 5. Directory Structure
+
+    infra/
+    └── docker/
+        ├── infrastructure/
+        ├── applications/
+        ├── observability/
+        │   ├── docker-compose.yml
+        │   ├── prometheus/
+        │   ├── promtail/
+        │   ├── grafana/
+        │   └── loki/
+        ├── docs/
+        │   └── Docker-Environment-Guide.md
+        └── README.md
+
+------------------------------------------------------------------------
+
+# 6. Docker Network
+
+All containers communicate through:
+
+    infra_msimpl-network
+
+Examples:
+
+  Service                    Address
+  -------------------------- ----------------------------------
+  Kafka                      kafka:9092
+  Wallet                     ms-wallet:8080
+  Notification               ms-notification:8081
+  Transaction Orchestrator   ms-transaction-orchestrator:8082
+  Prometheus                 prometheus:9090
+  Loki                       loki:3100
+  Grafana                    grafana:3000
+
+------------------------------------------------------------------------
+
+# 7. Configuration Strategy
+
+Configuration is externalized using environment variables.
+
+Examples:
+
+-   DB_HOST
+-   DB_PORT
+-   KAFKA_HOST
+-   LOG_PATH
+
+No application code changes are required between Docker and Kubernetes.
+
+------------------------------------------------------------------------
+
+# 8. Logging Strategy
+
+Applications write logs to:
+
+    /app/logs
+
+Docker bind mount:
+
+    ../../../logs:/app/logs
+
+Promtail mounts the same host directory:
+
+    ../../../logs:/var/log/app
+
+Log flow:
+
+    Spring Boot
+          │
+          ▼
+    /app/logs
+          │
+          ▼
+    Host logs
+          │
+          ▼
+    Promtail
+          │
+          ▼
+    Loki
+          │
+          ▼
+    Grafana
+
+------------------------------------------------------------------------
+
+# 9. Metrics Strategy
+
+Each application exposes:
+
+    /actuator/prometheus
+
+Prometheus scrapes:
+
+-   ms-wallet:8080
+-   ms-notification:8081
+-   ms-transaction-orchestrator:8082
+
+Grafana visualizes the metrics.
+
+------------------------------------------------------------------------
+
+# 10. Startup Sequence
+
+## Step 1 -- Infrastructure
+
+    cd infra/docker/infrastructure
+    docker compose up -d
+
+Starts:
+
+-   Kafka
+-   Kafka UI
+
+## Step 2 -- Applications
+
+    cd infra/docker/applications
+    docker compose up -d
+
+Starts application containers.
+
+## Step 3 -- Observability
+
+    cd infra/docker/observability
+    docker compose up -d
+
+Starts:
+
+-   Prometheus
+-   Grafana
+-   Loki
+-   Promtail
+
+------------------------------------------------------------------------
+
+# 11. Verification
+
+Verify containers:
+
+    docker ps
+
+Verify network:
+
+    docker network ls
+
+Verify logs:
+
+    logs/
+
+Verify Prometheus:
+
+    http://localhost:9090
+
+Verify Grafana:
+
+    http://localhost:3000
+
+Verify Loki:
+
+    http://localhost:3100
+
+Verify Kafka UI:
+
+    http://localhost:8085
+
+------------------------------------------------------------------------
+
+# 12. Deployment Workflow
+
+    Modify Code
+          │
+    Build JAR
+          │
+    Build Docker Image
+          │
+    Docker Compose
+          │
+    Run Containers
+          │
+    Verify Logs
+          │
+    Verify Metrics
+
+------------------------------------------------------------------------
+
+# 13. Migration to Kubernetes
+
+    Spring Boot
+          │
+    Build JAR
+          │
+    Docker Image
+          │
+    Docker Container
+          │
+    Kubernetes
+          │
+    AWS EKS
+
+The Docker image remains unchanged.
+
+------------------------------------------------------------------------
+
+# 14. Design Principles
+
+-   Immutable Docker images
+-   Shared Docker network
+-   Externalized configuration
+-   Centralized logging
+-   Centralized metrics
+-   Production-like deployment
+-   Kubernetes-ready architecture
+
+------------------------------------------------------------------------
+
+# 15. Troubleshooting
+
+## Kafka not reachable
+
+-   Verify Kafka container.
+-   Verify Docker network.
+-   Verify kafka:9092.
+
+## Logs not appearing
+
+-   Verify bind mount.
+-   Verify LOG_PATH.
+-   Verify Promtail.
+
+## Prometheus target DOWN
+
+-   Verify application container.
+-   Verify `/actuator/prometheus`.
+
+## Grafana empty
+
+-   Verify datasources.
+-   Verify Loki and Prometheus.
+
+------------------------------------------------------------------------
+
+# 16. Summary
+
+The Docker environment provides a production-like deployment platform
+where Spring Boot microservices, infrastructure, and observability run
+as Docker containers using a shared Docker network. The same Docker
+images and configuration strategy are reused during Kubernetes
+deployment without changing application code.

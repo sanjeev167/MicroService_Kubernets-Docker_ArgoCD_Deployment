@@ -1,0 +1,27 @@
+2026-07-01 23:04:21.109 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - Starting MsNotificationApplication using Java 17.0.10 with PID 23212 (F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification\target\classes started by conta in F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification)
+2026-07-01 23:04:21.115 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - No active profile set, falling back to 1 default profile: "default"
+2026-07-01 23:04:26.185 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Initializing ProtocolHandler ["http-nio-8081"]
+2026-07-01 23:04:26.190 [restartedMain] INFO  o.a.catalina.core.StandardService [service=ms-notification] [traceId=] [txnId=] - Starting service [Tomcat]
+2026-07-01 23:04:26.191 [restartedMain] INFO  o.a.catalina.core.StandardEngine [service=ms-notification] [traceId=] [txnId=] - Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-07-01 23:04:26.326 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-notification] [traceId=] [txnId=] - Initializing Spring embedded WebApplicationContext
+2026-07-01 23:04:26.754 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Starting...
+2026-07-01 23:04:27.127 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@59c0138b
+2026-07-01 23:04:27.132 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Start completed.
+2026-07-01 23:04:27.271 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper [service=ms-notification] [traceId=] [txnId=] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-01 23:04:27.494 [restartedMain] INFO  org.hibernate.Version [service=ms-notification] [traceId=] [txnId=] - HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-07-01 23:04:27.636 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000026: Second-level cache disabled
+2026-07-01 23:04:29.074 [restartedMain] WARN  org.hibernate.orm.deprecation [service=ms-notification] [traceId=] [txnId=] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-01 23:04:29.116 [restartedMain] INFO  o.hibernate.orm.connections.pooling [service=ms-notification] [traceId=] [txnId=] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-01 23:04:31.027 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-01 23:04:32.850 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [service=ms-notification] [traceId=] [txnId=] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-01 23:04:34.231 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Starting ProtocolHandler ["http-nio-8081"]
+2026-07-01 23:04:34.837 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - Started MsNotificationApplication in 15.361 seconds (process running for 20.447)
+2026-07-01 23:04:35.574 [RMI TCP Connection(5)-127.0.0.1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-notification] [traceId=] [txnId=] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-01 23:04:36.224 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] WARN  o.apache.kafka.clients.NetworkClient [service=ms-notification] [traceId=] [txnId=] - [Consumer clientId=consumer-notification-saga-request-consumer-1, groupId=notification-saga-request-consumer] The metadata response from the cluster reported a recoverable issue with correlation id 3 : {notification-request-topic=UNKNOWN_TOPIC_OR_PARTITION}

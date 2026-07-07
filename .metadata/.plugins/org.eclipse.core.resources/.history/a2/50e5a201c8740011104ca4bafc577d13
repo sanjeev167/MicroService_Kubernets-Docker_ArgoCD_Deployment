@@ -1,0 +1,149 @@
+# ==========================================================
+# Service Configuration
+# Service: ms-wallet
+# Author: Sanjeev Kumar
+# Date: 2026-06-06
+#
+# ==========================================================
+# 🔒 MSIMPL PHASE 1 ALIGNMENT (LOCKED)
+# ==========================================================
+#
+# This configuration is aligned with:
+#
+#   ✔ Manual Kafka acknowledgment (Java Config)
+#   ✔ Raw JSON (String) consumption
+#   ✔ Manual ObjectMapper parsing in listener
+#   ✔ Foundation for Retry + DLQ
+#
+# 🚫 DO NOT MODIFY Kafka behavior without architectural review
+#
+# ==========================================================
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ms-wallet
+    
+  config:
+    import: classpath:application-db.yml
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # ⚠ Use 'validate' in production
+    show-sql: true       # ⚠ Disable in production
+
+  kafka:
+    # ------------------------------------------------------
+    # Kafka Broker Configuration
+    # ------------------------------------------------------
+    bootstrap-servers: localhost:29092
+
+    # ======================================================
+    # PRODUCER CONFIGURATION (Wallet → Orchestrator)
+    # ======================================================
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      acks: all
+      retries: 3
+
+      properties:
+        spring.json.add.type.headers: false
+
+    # ======================================================
+    # CONSUMER CONFIGURATION (Orchestrator → Wallet)
+    # ======================================================
+    consumer:
+      group-id: default-wallet-group
+
+      # --------------------------------------------------
+      # 🔒 DESERIALIZATION STRATEGY (LOCKED)
+      # --------------------------------------------------
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      # --------------------------------------------------
+      # 🔴 OFFSET MANAGEMENT (CRITICAL)
+      # --------------------------------------------------
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+
+      # --------------------------------------------------
+      # 🚫 STRICT RULES
+      # --------------------------------------------------
+      # - DO NOT use JsonDeserializer
+      # - DO NOT rely on Kafka for object mapping
+
+# ==========================================================
+# Topic Configuration
+# ==========================================================
+
+wallet:
+  topic:
+    request: wallet-request-topic
+    response: wallet-response-topic
+    compensation: wallet-compensation-topic   # ✅ fixed typo
+    
+  consumer:
+    group-id: wallet-consumer-group
+
+# ==========================================================
+# 📊 OBSERVABILITY CONFIGURATION (PHASE 2 - NON INTRUSIVE)
+# ==========================================================
+#
+# Technologies:
+#   - :contentReference[oaicite:0]{index=0}
+#   - :contentReference[oaicite:1]{index=1}
+#
+# PURPOSE:
+#   ✔ Expose JVM, HTTP and custom metrics
+#   ✔ Enable Prometheus scraping
+#   ✔ Support Grafana dashboards (next phase)
+#
+# SAFETY:
+#   ✔ No impact on Kafka / DB / business logic
+#   ✔ Read-only endpoints
+#
+# ==========================================================
+
+management:
+
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+
+  endpoint:
+    health:
+      show-details: always   # ⚠ Restrict in production
+
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# ==========================================================
+# 📌 VERIFICATION STEPS
+# ==========================================================
+#
+# 1. Start Service
+#
+# 2. Access:
+#    http://localhost:8080/actuator/prometheus
+#
+# 3. Expected Metrics:
+#    - jvm_memory_used_bytes
+#    - http_server_requests_seconds
+#    - process_cpu_usage
+#
+# ==========================================================

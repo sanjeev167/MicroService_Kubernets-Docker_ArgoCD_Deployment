@@ -1,0 +1,30 @@
+2026-07-03 20:12:31.169 [main] INFO  com.wallet.MsWalletApplication [service=ms-wallet] [traceId=] [txnId=] - Starting MsWalletApplication using Java 17.0.10 with PID 7876 (F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-wallet\target\classes started by conta in F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-wallet)
+2026-07-03 20:12:31.175 [main] INFO  com.wallet.MsWalletApplication [service=ms-wallet] [traceId=] [txnId=] - No active profile set, falling back to 1 default profile: "default"
+2026-07-03 20:12:34.437 [main] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-wallet] [traceId=] [txnId=] - Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-03 20:12:34.442 [main] INFO  o.a.catalina.core.StandardService [service=ms-wallet] [traceId=] [txnId=] - Starting service [Tomcat]
+2026-07-03 20:12:34.444 [main] INFO  o.a.catalina.core.StandardEngine [service=ms-wallet] [traceId=] [txnId=] - Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-07-03 20:12:34.575 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-wallet] [traceId=] [txnId=] - Initializing Spring embedded WebApplicationContext
+2026-07-03 20:12:34.904 [main] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Starting...
+2026-07-03 20:12:35.202 [main] INFO  com.zaxxer.hikari.pool.HikariPool [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3cbfdf5c
+2026-07-03 20:12:35.205 [main] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Start completed.
+2026-07-03 20:12:35.300 [main] INFO  o.h.jpa.internal.util.LogHelper [service=ms-wallet] [traceId=] [txnId=] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-03 20:12:35.409 [main] INFO  org.hibernate.Version [service=ms-wallet] [traceId=] [txnId=] - HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-07-03 20:12:35.529 [main] INFO  o.h.c.i.RegionFactoryInitiator [service=ms-wallet] [traceId=] [txnId=] - HHH000026: Second-level cache disabled
+2026-07-03 20:12:36.240 [main] WARN  org.hibernate.orm.deprecation [service=ms-wallet] [traceId=] [txnId=] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-03 20:12:36.278 [main] INFO  o.hibernate.orm.connections.pooling [service=ms-wallet] [traceId=] [txnId=] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-03 20:12:37.673 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [service=ms-wallet] [traceId=] [txnId=] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-03 20:12:39.262 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [service=ms-wallet] [traceId=] [txnId=] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-03 20:12:40.200 [main] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-wallet] [traceId=] [txnId=] - Starting ProtocolHandler ["http-nio-8080"]
+2026-07-03 20:12:40.661 [main] INFO  com.wallet.MsWalletApplication [service=ms-wallet] [traceId=] [txnId=] - Started MsWalletApplication in 10.924 seconds (process running for 13.131)
+2026-07-03 20:12:49.851 [RMI TCP Connection(5)-127.0.0.1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-wallet] [traceId=] [txnId=] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-03 23:10:17.289 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-wallet] [traceId=] [txnId=] - Pausing ProtocolHandler ["http-nio-8080"]
+2026-07-03 23:10:17.506 [RMI TCP Connection(220)-127.0.0.1] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-wallet] [traceId=] [txnId=] - Stopping ProtocolHandler ["http-nio-8080"]
+2026-07-03 23:10:17.719 [RMI TCP Connection(220)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Shutdown initiated...
+2026-07-03 23:10:17.738 [RMI TCP Connection(220)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-wallet] [traceId=] [txnId=] - HikariPool-1 - Shutdown completed.

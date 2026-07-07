@@ -1,0 +1,130 @@
+# ==========================================================
+# MSIMPL Kubernetes Deployment
+# File      : deployment.yaml
+# Service   : ms-transaction-orchestrator
+# Namespace : msimpl
+# Author    : Sanjeev Kumar
+#
+# Description
+# -----------
+# Deploys the Transaction Orchestrator Microservice into the
+# MSIMPL Kubernetes cluster.
+#
+# Features
+# --------
+# - Single replica deployment
+# - Uses local Docker image (Development)
+# - Externalized configuration through ConfigMaps
+# - Sensitive configuration through Secret
+# - Resource Requests & Limits
+# - Startup, Readiness and Liveness Probes
+#
+# Notes
+# -----
+# This deployment is optimized for:
+# - Local Kubernetes Cluster
+# - 8 GB RAM Development Machine
+# - Docker Desktop
+# - Kafka
+# - PostgreSQL
+# - Prometheus
+# - Grafana
+# - Loki
+# - Promtail
+#
+# The same deployment can later be migrated to AWS EKS by
+# changing only the Docker image reference.
+#
+# ==========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ms-transaction-orchestrator
+  namespace: msimpl
+
+  labels:
+    app: ms-transaction-orchestrator
+
+spec:
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ms-transaction-orchestrator
+
+  template:
+
+    metadata:
+      labels:
+        app: ms-transaction-orchestrator
+
+    spec:
+
+      containers:
+
+        - name: ms-transaction-orchestrator
+
+          image: ms-transaction-orchestrator:1.0
+
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8082
+
+          envFrom:
+
+            - configMapRef:
+                name: msimpl-common-config
+
+            - configMapRef:
+                name: ms-transaction-orchestrator-db-config
+
+            - configMapRef:
+                name: msimpl-kafka-config
+
+            - configMapRef:
+                name: msimpl-observability-config
+
+            - secretRef:
+                name: msimpl-secret
+
+          resources:
+
+            requests:
+              cpu: "200m"
+              memory: "384Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "768Mi"
+
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8082
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8082
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3

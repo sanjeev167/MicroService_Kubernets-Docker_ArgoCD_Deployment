@@ -1,0 +1,170 @@
+# ============================================================================
+# MSIMPL - Kubernetes Service Configuration
+#
+# File        : ms-wallet-service.yaml
+# Service     : ms-wallet
+# Environment : Kubernetes
+# Author      : Sanjeev Kumar
+#
+# Description
+# -----------
+# This file creates a Kubernetes Service for the ms-wallet microservice.
+#
+# A Service provides a stable network endpoint for one or more Pods.
+# Pods are temporary resources whose names and IP addresses change whenever
+# they are recreated (during rolling updates, failures, scaling, etc.).
+#
+# Instead of communicating directly with Pod IP addresses, other
+# microservices communicate with this Service.
+#
+# Example:
+#     http://ms-wallet:8080
+#
+# Kubernetes automatically forwards the request to one of the healthy
+# Wallet Pods.
+#
+# This Service uses the ClusterIP type because ms-wallet is an internal
+# microservice. It is intended to be consumed only by other services inside
+# the Kubernetes cluster and is not exposed directly to external clients.
+# ============================================================================
+
+# ============================================================================
+# Request Flow
+# ============================================================================
+# Transaction Service
+# │
+# ▼
+# http://ms-wallet:8080
+# │
+# ▼
+# Kubernetes Service (ClusterIP)
+# │
+# ▼
+# Wallet Pod(s)
+# │
+# ▼
+# Spring Boot Application
+# ============================================================================
+
+# ============================================================================
+# Port Flow
+# ============================================================================
+# Spring Boot Application
+# │
+# ▼
+# server.port = 8080
+# │
+# ▼
+# Container Port (8080)
+# │
+# ▼
+# targetPort (8080)
+# │
+# ▼
+# Service Port (8080)
+# │
+# ▼
+# Other Microservices
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# Kubernetes API version.
+# ----------------------------------------------------------------------------
+apiVersion: v1
+
+# ----------------------------------------------------------------------------
+# Specifies that this resource is a Kubernetes Service.
+# ----------------------------------------------------------------------------
+kind: Service
+
+metadata:
+  # --------------------------------------------------------------------------
+  # Name of the Service.
+  # --------------------------------------------------------------------------
+  name: ms-wallet
+
+  # --------------------------------------------------------------------------
+  # Namespace where this Service will be created.
+  # --------------------------------------------------------------------------
+  namespace: msimpl
+
+spec:
+  # --------------------------------------------------------------------------
+  # Service Type
+  # --------------------------------------------------------------------------
+  type: ClusterIP
+
+  # --------------------------------------------------------------------------
+  # Service Selector
+  # --------------------------------------------------------------------------
+  selector:
+    app: ms-wallet
+
+  # --------------------------------------------------------------------------
+  # Port Configuration
+  # --------------------------------------------------------------------------
+  ports:
+    - protocol: TCP
+      # ----------------------------------------------------------------------
+      # Service Port
+      # ----------------------------------------------------------------------
+      port: 8080
+      # ----------------------------------------------------------------------
+      # Target Port
+      # ----------------------------------------------------------------------
+      targetPort: 8080
+
+# ============================================================================
+# Complete Networking Flow
+# ============================================================================
+# Transaction Service
+# │
+# ▼
+# http://ms-wallet:8080
+# │
+# ▼
+# CoreDNS resolves "ms-wallet"
+# │
+# ▼
+# ClusterIP
+# │
+# ▼
+# Kubernetes Service
+# │
+# ▼
+# Wallet Pod (Selected by label: app=ms-wallet)
+# │
+# ▼
+# Spring Boot Application (Port 8080)
+# ============================================================================
+
+# ============================================================================
+# Why Both port and targetPort are 8080?
+# ============================================================================
+# Keeping both values as 8080 provides a clean and consistent configuration.
+#
+# Client Application
+# │
+# ▼
+# Service Port      : 8080
+# │
+# ▼
+# Target Port       : 8080
+# │
+# ▼
+# Spring Boot Port  : 8080
+#
+# Although Kubernetes allows different values (for example, Service Port 80
+# forwarding to Target Port 8080), using the same port number simplifies
+# configuration and troubleshooting for internal microservice communication.
+# ============================================================================
+
+# ============================================================================
+# MSIMPL Best Practice
+# ============================================================================
+# ✔ Use ClusterIP for all internal microservices.
+# ✔ Access services using DNS names instead of Pod IP addresses.
+# ✔ Keep Service port and targetPort consistent unless translation is required.
+# ✔ Ensure the selector exactly matches the labels defined in the Deployment.
+# ✔ Never hardcode Pod IP addresses in application configuration.
+# ============================================================================

@@ -1,0 +1,84 @@
+2026-06-19 23:11:08.971 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - Starting MsNotificationApplication using Java 17.0.10 with PID 20432 (F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification\target\classes started by conta in F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification)
+2026-06-19 23:11:08.972 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - No active profile set, falling back to 1 default profile: "default"
+2026-06-19 23:11:10.323 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Initializing ProtocolHandler ["http-nio-8081"]
+2026-06-19 23:11:10.325 [restartedMain] INFO  o.a.catalina.core.StandardService [service=ms-notification] [traceId=] [txnId=] - Starting service [Tomcat]
+2026-06-19 23:11:10.326 [restartedMain] INFO  o.a.catalina.core.StandardEngine [service=ms-notification] [traceId=] [txnId=] - Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-06-19 23:11:10.377 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-notification] [traceId=] [txnId=] - Initializing Spring embedded WebApplicationContext
+2026-06-19 23:11:10.467 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-2 - Starting...
+2026-06-19 23:11:10.547 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool [service=ms-notification] [traceId=] [txnId=] - HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@788860d3
+2026-06-19 23:11:10.548 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-2 - Start completed.
+2026-06-19 23:11:10.570 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper [service=ms-notification] [traceId=] [txnId=] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-19 23:11:10.579 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000026: Second-level cache disabled
+2026-06-19 23:11:10.653 [restartedMain] WARN  org.hibernate.orm.deprecation [service=ms-notification] [traceId=] [txnId=] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-19 23:11:10.657 [restartedMain] INFO  o.hibernate.orm.connections.pooling [service=ms-notification] [traceId=] [txnId=] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-2)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-19 23:11:10.784 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-19 23:11:11.066 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [service=ms-notification] [traceId=] [txnId=] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-19 23:11:11.404 [restartedMain] WARN  o.s.b.d.a.OptionalLiveReloadServer [service=ms-notification] [traceId=] [txnId=] - Unable to start LiveReload server
+2026-06-19 23:11:11.456 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Starting ProtocolHandler ["http-nio-8081"]
+2026-06-19 23:11:11.523 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - Started MsNotificationApplication in 2.91 seconds (process running for 623.177)
+2026-06-19 23:11:12.068 [http-nio-8081-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-notification] [traceId=] [txnId=] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-19 23:39:04.071 [HikariPool-2:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool [service=ms-notification] [traceId=] [txnId=] - HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=4m23s92ms17µs).
+2026-06-19 23:41:26.292 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Pausing ProtocolHandler ["http-nio-8081"]
+2026-06-19 23:41:26.392 [RMI TCP Connection(46)-127.0.0.1] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Stopping ProtocolHandler ["http-nio-8081"]
+2026-06-19 23:41:26.418 [RMI TCP Connection(46)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-2 - Shutdown initiated...
+2026-06-19 23:41:26.424 [RMI TCP Connection(46)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-2 - Shutdown completed.
+2026-06-19 23:48:28.878 [main] INFO  c.n.MsNotificationApplicationTests [service=ms-notification] [traceId=] [txnId=] - Starting MsNotificationApplicationTests using Java 17.0.10 with PID 15248 (started by conta in F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification)
+2026-06-19 23:48:28.895 [main] INFO  c.n.MsNotificationApplicationTests [service=ms-notification] [traceId=] [txnId=] - No active profile set, falling back to 1 default profile: "default"
+2026-06-19 23:48:33.684 [main] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Starting...
+2026-06-19 23:48:34.346 [main] INFO  com.zaxxer.hikari.pool.HikariPool [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@915d7c4
+2026-06-19 23:48:34.349 [main] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Start completed.
+2026-06-19 23:48:34.543 [main] INFO  o.h.jpa.internal.util.LogHelper [service=ms-notification] [traceId=] [txnId=] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-19 23:48:34.828 [main] INFO  org.hibernate.Version [service=ms-notification] [traceId=] [txnId=] - HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-06-19 23:48:34.963 [main] INFO  o.h.c.i.RegionFactoryInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000026: Second-level cache disabled
+2026-06-19 23:48:36.086 [main] WARN  org.hibernate.orm.deprecation [service=ms-notification] [traceId=] [txnId=] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-19 23:48:36.146 [main] INFO  o.hibernate.orm.connections.pooling [service=ms-notification] [traceId=] [txnId=] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-19 23:48:38.157 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-19 23:48:39.923 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [service=ms-notification] [traceId=] [txnId=] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-19 23:48:42.340 [main] INFO  c.n.MsNotificationApplicationTests [service=ms-notification] [traceId=] [txnId=] - Started MsNotificationApplicationTests in 15.218 seconds (process running for 17.69)
+2026-06-19 23:48:47.457 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Shutdown initiated...
+2026-06-19 23:48:47.484 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Shutdown completed.
+2026-06-19 23:49:04.964 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - Starting MsNotificationApplication using Java 17.0.10 with PID 436 (F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification\target\classes started by conta in F:\microservices-platform_workspace_16-5-2026\microservices-platform\ms-notification)
+2026-06-19 23:49:05.005 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - No active profile set, falling back to 1 default profile: "default"
+2026-06-19 23:49:08.396 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Initializing ProtocolHandler ["http-nio-8081"]
+2026-06-19 23:49:08.400 [restartedMain] INFO  o.a.catalina.core.StandardService [service=ms-notification] [traceId=] [txnId=] - Starting service [Tomcat]
+2026-06-19 23:49:08.400 [restartedMain] INFO  o.a.catalina.core.StandardEngine [service=ms-notification] [traceId=] [txnId=] - Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-06-19 23:49:08.525 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-notification] [traceId=] [txnId=] - Initializing Spring embedded WebApplicationContext
+2026-06-19 23:49:08.832 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Starting...
+2026-06-19 23:49:09.876 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@edd9232
+2026-06-19 23:49:09.895 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Start completed.
+2026-06-19 23:49:10.265 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper [service=ms-notification] [traceId=] [txnId=] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-19 23:49:10.446 [restartedMain] INFO  org.hibernate.Version [service=ms-notification] [traceId=] [txnId=] - HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-06-19 23:49:10.547 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000026: Second-level cache disabled
+2026-06-19 23:49:11.569 [restartedMain] WARN  org.hibernate.orm.deprecation [service=ms-notification] [traceId=] [txnId=] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-19 23:49:11.617 [restartedMain] INFO  o.hibernate.orm.connections.pooling [service=ms-notification] [traceId=] [txnId=] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-19 23:49:13.591 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [service=ms-notification] [traceId=] [txnId=] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-19 23:49:14.651 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [service=ms-notification] [traceId=] [txnId=] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-19 23:49:15.574 [restartedMain] WARN  o.s.b.d.a.OptionalLiveReloadServer [service=ms-notification] [traceId=] [txnId=] - Unable to start LiveReload server
+2026-06-19 23:49:15.793 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Starting ProtocolHandler ["http-nio-8081"]
+2026-06-19 23:49:16.192 [restartedMain] INFO  c.n.MsNotificationApplication [service=ms-notification] [traceId=] [txnId=] - Started MsNotificationApplication in 12.462 seconds (process running for 14.015)
+2026-06-19 23:49:16.580 [RMI TCP Connection(7)-127.0.0.1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [service=ms-notification] [traceId=] [txnId=] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-19 23:57:38.560 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Pausing ProtocolHandler ["http-nio-8081"]
+2026-06-19 23:57:38.658 [Thread-1] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Stopping ProtocolHandler ["http-nio-8081"]
+2026-06-19 23:57:38.676 [Thread-1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Shutdown initiated...
+2026-06-19 23:57:38.686 [Thread-1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Shutdown completed.

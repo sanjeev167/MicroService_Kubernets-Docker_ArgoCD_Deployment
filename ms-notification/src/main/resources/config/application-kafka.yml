@@ -1,0 +1,269 @@
+# =============================================================================
+# File Name   : application-kafka.yml
+# Module      : Apache Kafka Configuration
+# Service     : MS Notification Service
+# Project     : MSIMPL - Microservices Platform
+# Author      : Sanjeev Kumar
+# Created On  : 06-Jun-2026
+# Last Updated: 03-Jul-2026
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+#
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|------------------------------------------
+# 1.0.0   | 06-Jun-2026 | Sanjeev Kumar  | Initial Kafka configuration.
+# 1.1.0   | 03-Jul-2026 | Sanjeev Kumar  | Refactored Kafka bootstrap server
+#         |             |                | configuration to use KAFKA_HOST and
+#         |             |                | KAFKA_PORT.
+#         |             |                | Standardized configuration for STS,
+#         |             |                | Docker, Kubernetes and AWS deployments.
+#
+# =============================================================================
+# PURPOSE
+# =============================================================================
+#
+# Centralized Apache Kafka configuration for the
+# MS Notification Service.
+#
+# This configuration supports multiple deployment
+# environments without requiring application code changes
+# or rebuilding the Docker image.
+#
+# Responsibilities
+# ----------------
+# ✔ Kafka Broker Configuration
+# ✔ Producer Configuration
+# ✔ Consumer Configuration
+# ✔ Topic Configuration
+# ✔ Consumer Group Configuration
+#
+# =============================================================================
+# CONFIGURATION STRATEGY
+# =============================================================================
+#
+# Spring resolves configuration properties using:
+#
+#     ${VARIABLE_NAME:DefaultValue}
+#
+# Resolution Order
+# ----------------
+#
+# 1. Environment Variable
+# 2. System Property
+# 3. Default Value
+#
+# Example
+#
+#     ${KAFKA_HOST:localhost}
+#
+# If KAFKA_HOST is defined, Spring uses its value.
+# Otherwise, it falls back to localhost.
+#
+# Default values are optimized for Spring Tool Suite (STS).
+#
+# Docker Compose, Kubernetes and AWS override these values
+# using Environment Variables, ConfigMaps, Secrets or
+# Spring Cloud Config.
+#
+# =============================================================================
+# ENVIRONMENT SUPPORT
+# =============================================================================
+#
+# Spring Tool Suite (STS)
+# -----------------------
+#
+# No environment variables are required.
+#
+# Default configuration:
+#
+#     KAFKA_HOST=localhost
+#     KAFKA_PORT=29092
+#
+#
+# Docker Compose
+# --------------
+#
+# Docker injects:
+#
+#     KAFKA_HOST=host.docker.internal
+#
+#
+# Kubernetes (Local)
+# ------------------
+#
+# External Kafka
+#
+#     KAFKA_HOST=host.docker.internal
+#
+# Internal Kafka
+#
+#     KAFKA_HOST=kafka-service
+#     KAFKA_PORT=9092
+#
+#
+# AWS EKS
+# -------
+#
+# Example:
+#
+#     KAFKA_HOST=<Amazon MSK Endpoint>
+#     KAFKA_PORT=9092
+#
+# Configuration is supplied through ConfigMaps,
+# Secrets or Spring Cloud Config.
+#
+# =============================================================================
+# ENVIRONMENT VARIABLES
+# =============================================================================
+#
+# KAFKA_HOST
+#     Kafka broker hostname.
+#
+# KAFKA_PORT
+#     Kafka broker port.
+#
+# =============================================================================
+# MSIMPL PHASE-1 STANDARD (LOCKED)
+# =============================================================================
+#
+# Kafka Consumption Strategy
+# --------------------------
+#
+# ✔ Raw JSON (String) Consumption
+# ✔ Manual Jackson ObjectMapper Parsing
+# ✔ Manual Acknowledgement
+# ✔ Retry Ready
+# ✔ Dead Letter Queue (DLQ) Ready
+#
+# DO NOT MODIFY:
+#
+# • Consumer Deserializer
+# • ACK Strategy
+# • Offset Commit Strategy
+#
+# without architectural review.
+#
+# =============================================================================
+# MSIMPL DEPLOYMENT STANDARD
+# =============================================================================
+#
+# ✔ STS Ready
+# ✔ Docker Ready
+# ✔ Kubernetes Ready
+# ✔ AWS EKS Ready
+# ✔ Spring Cloud Config Ready
+#
+# Same application code.
+#
+# Same executable JAR.
+#
+# Same Docker image.
+#
+# Only environment variables differ between deployments.
+#
+# =============================================================================
+
+spring:
+
+  kafka:
+
+    # =========================================================================
+    # Kafka Bootstrap Server
+    # =========================================================================
+    #
+    # The Kafka bootstrap server is dynamically constructed
+    # using environment variables.
+    #
+    # Default values support Spring Tool Suite (STS).
+    #
+    # Docker Compose, Kubernetes and AWS override these values
+    # using Environment Variables, ConfigMaps or Secrets.
+    #
+    # =========================================================================
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:29092}
+
+    # =========================================================================
+    # Producer Configuration
+    # =========================================================================
+
+    producer:
+
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      # Wait for acknowledgement from all in-sync replicas.
+      acks: all
+
+      # Retry transient failures.
+      retries: 3
+
+      properties:
+
+        # Prevent Java class metadata from being added
+        # to Kafka message headers.
+        spring.json.add.type.headers: false
+
+    # =========================================================================
+    # Consumer Configuration
+    # =========================================================================
+
+    consumer:
+
+      # Default Spring Kafka consumer group.
+      # Individual listeners may override this value.
+      group-id: default-notification-group
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      # Manual acknowledgement strategy.
+      enable-auto-commit: false
+
+      # Read existing records when a consumer group is created.
+      auto-offset-reset: earliest
+
+      # -----------------------------------------------------------------------
+      # MSIMPL Standard
+      # -----------------------------------------------------------------------
+      #
+      # DO NOT USE JsonDeserializer.
+      #
+      # Messages are consumed as raw JSON strings and
+      # manually converted using Jackson ObjectMapper.
+      #
+      # Benefits
+      #
+      # • Better version compatibility
+      # • Full deserialization control
+      # • Easier error handling
+      # • Retry and DLQ friendly
+      #
+      # -----------------------------------------------------------------------
+
+# =============================================================================
+# Notification Topic Configuration
+# =============================================================================
+
+notification:
+
+  topic:
+
+    request: notification-request-topic
+
+    response: notification-response-topic
+
+  consumer:
+
+    # Business consumer group used by Notification listeners.
+    # Keep this value unchanged unless the listener configuration
+    # is intentionally modified.
+    group-id: notification-saga-request-consumer
+
+# =============================================================================
+# End Of File
+# =============================================================================

@@ -1,0 +1,210 @@
+# ==========================================================
+# Service Configuration
+# Service: ms-transaction-orchestrator
+# Author: Sanjeev Kumar
+# Date: 2026-06-06
+#
+# ==========================================================
+# 🔒 MSIMPL PHASE 1 ALIGNMENT (LOCKED)
+# ==========================================================
+#
+# This service follows strict Kafka consumption rules:
+#
+#   ✔ Raw JSON (String) consumption
+#   ✔ Manual ObjectMapper parsing in listener
+#   ✔ Manual acknowledgment (NO auto commit)
+#   ✔ Multiple listeners with independent groupIds
+#   ✔ Foundation for Retry + DLQ
+#
+# 🚫 DO NOT MODIFY Kafka behavior without architectural review
+#
+# ==========================================================
+
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ms-transaction-orchestrator
+
+  config:
+    import: classpath:application-db.yml
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # ⚠ Use 'validate' in production
+    show-sql: true       # ⚠ Disable in production
+
+  kafka:
+    # ------------------------------------------------------
+    # Kafka Broker Configuration
+    # ------------------------------------------------------
+    bootstrap-servers: localhost:29092
+
+    # ======================================================
+    # PRODUCER CONFIGURATION (Orchestrator → External Services)
+    # ======================================================
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      # --------------------------------------------------
+      # Reliability Guarantees
+      # --------------------------------------------------
+      acks: all
+      retries: 3
+
+      properties:
+        # --------------------------------------------------
+        # 🔒 Avoid Cross-Service Type Coupling
+        # --------------------------------------------------
+        spring.json.add.type.headers: false
+
+    # ======================================================
+    # CONSUMER CONFIGURATION (External Services → Orchestrator)
+    # ======================================================
+    consumer:
+
+      # --------------------------------------------------
+      # 🔒 DESERIALIZATION STRATEGY (LOCKED)
+      # --------------------------------------------------
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      # --------------------------------------------------
+      # 🔴 CRITICAL: OFFSET MANAGEMENT
+      # --------------------------------------------------
+      enable-auto-commit: false
+
+      # --------------------------------------------------
+      # Offset Reset Strategy
+      # --------------------------------------------------
+      auto-offset-reset: earliest
+
+      # --------------------------------------------------
+      # 🚫 IMPORTANT RULES
+      # --------------------------------------------------
+      # - group-id is NOT defined here
+      # - Each @KafkaListener defines its own groupId
+      # - Required for multi-listener orchestration
+      #
+      # DO NOT:
+      # - Add global group-id
+      # - Use JsonDeserializer
+
+# ==========================================================
+# Topic Configuration (FINAL - PHASE 2)
+# ==========================================================
+
+wallet:
+  topic:
+    request: wallet-request-topic
+    response: wallet-response-topic
+    compensation-request: wallet-compensation-request-topic
+    compensation-response: wallet-compensation-response-topic
+
+notification:
+  topic:
+    request: notification-request-topic
+    response: notification-response-topic
+
+# ==========================================================
+# CONSUMER GROUP CONFIGURATION (SERVICE LEVEL)
+# ==========================================================
+
+orchestrator:
+  consumer:
+    wallet-response-group: orchestrator-wallet-response-group
+    notification-response-group: orchestrator-notification-response-group
+    compensation-response-group: wallet-compensation-response-group
+
+# ==========================================================
+# 📊 OBSERVABILITY CONFIGURATION (PHASE 2 - NON INTRUSIVE)
+# ==========================================================
+#
+# Technologies:
+#   - :contentReference[oaicite:0]{index=0}
+#   - :contentReference[oaicite:1]{index=1}
+#
+# PURPOSE:
+#   ✔ Monitor saga orchestration flow
+#   ✔ Track request/response latency across services
+#   ✔ Enable system-wide visibility via Prometheus
+#
+# SAFETY:
+#   ✔ No impact on Kafka listeners
+#   ✔ No impact on groupId strategy
+#   ✔ Read-only metrics exposure
+#
+# ==========================================================
+
+management:
+
+  # ------------------------------------------------------
+  # Endpoint Exposure
+  # ------------------------------------------------------
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+
+  # ------------------------------------------------------
+  # Health Endpoint
+  # ------------------------------------------------------
+  endpoint:
+    health:
+      show-details: always   # ⚠ Restrict in production
+
+  # ------------------------------------------------------
+  # Metrics Configuration (Micrometer)
+  # ------------------------------------------------------
+  metrics:
+    tags:
+      # --------------------------------------------------
+      # Service Identification Tag
+      # --------------------------------------------------
+      # Critical for multi-service dashboards (Grafana)
+      application: ${spring.application.name}
+
+  # ------------------------------------------------------
+  # Prometheus Export
+  # ------------------------------------------------------
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# ==========================================================
+# 📌 VERIFICATION STEPS
+# ==========================================================
+#
+# 1. Start Service
+#
+# 2. Access:
+#    http://localhost:8082/actuator/prometheus
+#
+# 3. Validate Metrics:
+#    - jvm_memory_used_bytes
+#    - http_server_requests_seconds
+#    - process_cpu_usage
+#
+# ==========================================================
+# 🚀 NEXT PHASE (CRITICAL FOR ORCHESTRATOR)
+# ==========================================================
+#
+#   ➤ Add Custom Saga Metrics:
+#
+#       - saga.transaction.started
+#       - saga.transaction.completed
+#       - saga.transaction.failed
+#       - saga.compensation.triggered
+#
+#   ➤ Add Timer Metrics:
+#       - saga.execution.time
+#
+#   ➤ Correlate with traceId (MDC)
+#
+# ==========================================================

@@ -1,0 +1,381 @@
+# =============================================================================
+# File Name   : application-observability.yml
+# Module      : Observability Configuration
+# Service     : All MSIMPL Microservices
+# Project     : MSIMPL - Microservices Platform
+# Author      : Sanjeev Kumar
+# Created On  : 01-Jul-2026
+# Last Updated: 03-Jul-2026
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+#
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|------------------------------------------
+# 1.0.0   | 01-Jul-2026 | Sanjeev Kumar  | Initial observability configuration.
+# 1.1.0   | 03-Jul-2026 | Sanjeev Kumar  | Standardized documentation and verified
+#         |             |                | environment-independent configuration
+#         |             |                | for STS, Docker, Kubernetes and AWS.
+#
+# =============================================================================
+# PURPOSE
+# =============================================================================
+#
+# Centralized observability configuration shared by all
+# MSIMPL microservices.
+#
+# This configuration enables Spring Boot Actuator and
+# Prometheus metrics without requiring any changes to
+# business logic.
+#
+# Observability settings are intentionally isolated from
+# application.yml to separate infrastructure concerns from
+# application-specific configuration.
+#
+# Responsibilities
+# ----------------
+# ✔ Enable Spring Boot Actuator
+# ✔ Expose Prometheus metrics
+# ✔ Expose Health endpoint
+# ✔ Expose Application Information endpoint
+# ✔ Configure common metric tags
+# ✔ Support centralized monitoring
+# ✔ Environment-independent configuration
+#
+# =============================================================================
+# OBSERVABILITY ARCHITECTURE
+# =============================================================================
+#
+#            Spring Boot Microservice
+#                     │
+#                     │
+#        /actuator/prometheus
+#                     │
+#                     ▼
+#              Prometheus Server
+#                     │
+#                     ▼
+#               Grafana Dashboard
+#
+#
+# Application Logs
+#         │
+#         ▼
+#     Promtail
+#         │
+#         ▼
+#       Loki
+#         │
+#         ▼
+#     Grafana
+#
+#
+# Metrics Pipeline
+# ----------------
+#
+# Spring Boot
+#      │
+#      ▼
+# Actuator
+#      │
+#      ▼
+# Prometheus
+#      │
+#      ▼
+# Grafana
+#
+#
+# Logs Pipeline
+# -------------
+#
+# Application Logs
+#        │
+#        ▼
+# Promtail
+#        │
+#        ▼
+# Loki
+#        │
+#        ▼
+# Grafana
+#
+#
+# Prometheus collects METRICS.
+# Promtail collects LOGS.
+#
+# These are independent observability pipelines.
+#
+# =============================================================================
+# CONFIGURATION STRATEGY
+# =============================================================================
+#
+# This configuration contains no environment-specific
+# infrastructure values.
+#
+# The same configuration is used across:
+#
+# • Spring Tool Suite (STS)
+# • Docker Compose
+# • Kubernetes
+# • AWS EKS
+#
+# Environment-specific deployment is handled by the
+# monitoring infrastructure rather than by the application.
+#
+# =============================================================================
+# ENVIRONMENT SUPPORT
+# =============================================================================
+#
+# Spring Tool Suite (STS)
+# -----------------------
+#
+# Spring Boot applications expose Actuator endpoints.
+#
+# Prometheus scrapes metrics from:
+#
+#     /actuator/prometheus
+#
+#
+# Docker Compose
+# --------------
+#
+# Prometheus discovers and scrapes Docker-hosted
+# Spring Boot applications.
+#
+#
+# Kubernetes
+# ----------
+#
+# Prometheus discovers application Pods through
+# Kubernetes Service discovery.
+#
+#
+# AWS EKS
+# -------
+#
+# Amazon Managed Prometheus or self-managed Prometheus
+# may scrape application metrics.
+#
+# Grafana dashboards remain unchanged.
+#
+# =============================================================================
+# MSIMPL DEPLOYMENT STANDARD
+# =============================================================================
+#
+# ✔ STS Ready
+# ✔ Docker Ready
+# ✔ Kubernetes Ready
+# ✔ AWS EKS Ready
+# ✔ Spring Cloud Config Ready
+#
+# This configuration is completely environment independent.
+#
+# No application code changes are required.
+#
+# No Docker image rebuild is required.
+#
+# =============================================================================
+
+management:
+
+  # ===========================================================================
+  # Actuator Endpoint Exposure
+  # ===========================================================================
+  #
+  # Exposes selected Spring Boot Actuator endpoints.
+  #
+  # Available Endpoints
+  #
+  #   /actuator/health
+  #   /actuator/info
+  #   /actuator/prometheus
+  #
+  # Production Recommendation
+  #
+  # Expose only the endpoints required by monitoring
+  # infrastructure.
+  #
+  endpoints:
+
+    web:
+
+      exposure:
+
+        include:
+          - health
+          - info
+          - prometheus
+
+  # ===========================================================================
+  # Health Endpoint Configuration
+  # ===========================================================================
+  #
+  # Controls the behaviour of:
+  #
+  #     /actuator/health
+  #
+  # During development detailed health information
+  # simplifies troubleshooting.
+  #
+  # Production Recommendation
+  #
+  #     show-details: when_authorized
+  #
+  endpoint:
+
+    health:
+
+      show-details: always
+
+  # ===========================================================================
+  # Metrics Configuration
+  # ===========================================================================
+  #
+  # Adds common tags to every exported metric.
+  #
+  # Example:
+  #
+  # application="ms-wallet"
+  #
+  # This allows Grafana dashboards to filter metrics
+  # when monitoring multiple microservices.
+  #
+  metrics:
+
+    tags:
+
+      application: ${spring.application.name}
+
+  # ===========================================================================
+  # Prometheus Configuration
+  # ===========================================================================
+  #
+  # Enables Prometheus metric export.
+  #
+  # Prometheus periodically scrapes:
+  #
+  #     /actuator/prometheus
+  #
+  # and stores application metrics.
+  #
+  prometheus:
+
+    metrics:
+
+      export:
+
+        enabled: true
+
+# =============================================================================
+# VERIFICATION CHECKLIST
+# =============================================================================
+#
+# Step 1
+# ------
+# Start the Spring Boot application.
+#
+#
+# Step 2
+# ------
+# Verify Actuator endpoints.
+#
+# Example:
+#
+# http://localhost:8080/actuator
+#
+# Replace 8080 with the application's configured server port.
+#
+#
+# Step 3
+# ------
+# Verify Prometheus endpoint.
+#
+# Example:
+#
+# http://localhost:8080/actuator/prometheus
+#
+# Expected metrics include:
+#
+# • jvm_memory_used_bytes
+# • process_cpu_usage
+# • system_cpu_usage
+# • http_server_requests_seconds
+#
+#
+# Step 4
+# ------
+# Verify Prometheus.
+#
+# Example:
+#
+# http://localhost:9090
+#
+# Navigate to:
+#
+# Status → Targets
+#
+# Verify the application target is UP.
+#
+#
+# Step 5
+# ------
+# Verify Grafana.
+#
+# Example:
+#
+# http://localhost:3000
+#
+# Dashboards should display application metrics.
+#
+# =============================================================================
+# TROUBLESHOOTING
+# =============================================================================
+#
+# Problem
+# -------
+# Prometheus target is DOWN (404).
+#
+# Possible Causes
+#
+# ✔ application-observability.yml not imported
+# ✔ micrometer-registry-prometheus dependency missing
+# ✔ /actuator/prometheus not exposed
+#
+#
+# Problem
+# -------
+# Only /actuator/health is visible.
+#
+# Possible Causes
+#
+# ✔ application-observability.yml not loaded
+# ✔ Actuator endpoint exposure not configured
+#
+#
+# Problem
+# -------
+# Metrics not visible in Grafana.
+#
+# Verify
+#
+# ✔ Prometheus target is UP
+# ✔ Prometheus datasource configured
+# ✔ Dashboard query is correct
+#
+#
+# Problem
+# -------
+# No metrics appear in Prometheus.
+#
+# Verify
+#
+# ✔ Application is running
+# ✔ Correct application port
+# ✔ Prometheus scrape configuration
+# ✔ Network connectivity
+#
+# =============================================================================
+# End Of File
+# =============================================================================

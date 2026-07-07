@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+==========================================================
+PROJECT: ms-notification (Spring Boot Microservice)
+==========================================================
+
+AUTHOR: Sanjeev Kumar
+DATE: June 2026
+
+PURPOSE:
+- Notification microservice responsible for sending and managing notifications
+- Integrated with Kafka for event-driven orchestration
+- Uses PostgreSQL for persistence
+- Provides observability via Actuator + Prometheus metrics
+- Supports developer productivity with DevTools
+
+==========================================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- Maven model version -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Spring Boot parent for dependency management -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.14</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <!-- Project coordinates -->
+    <groupId>com.pon</groupId>
+    <artifactId>ms-notification</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>ms-notification</name>
+    <description>Notification microservice for saga orchestration</description>
+    <url>https://github.com/pon/ms-notification</url>
+
+    <!-- Licensing information -->
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <!-- Developer metadata -->
+    <developers>
+        <developer>
+            <id>sanjeev</id>
+            <name>Sanjeev Kumar</name>
+            <email>sanjeev@example.com</email>
+        </developer>
+    </developers>
+
+    <!-- Source control management -->
+    <scm>
+        <connection>scm:git:git://github.com/pon/ms-notification.git</connection>
+        <developerConnection>scm:git:ssh://github.com/pon/ms-notification.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/pon/ms-notification</url>
+    </scm>
+
+    <!-- Java version -->
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <!-- ==========================================================
+         DEPENDENCIES
+         ========================================================== -->
+    <dependencies>
+
+        <!-- Core Spring Boot Web (REST APIs) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Kafka integration -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- JSON serialization/deserialization -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
+        </dependency>
+
+        <!-- Lombok (boilerplate reduction) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Testing framework -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JPA for persistence -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- DevTools for hot reload (developer productivity) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Core Spring Boot starter (base dependencies) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- PostgreSQL driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Actuator for health/metrics endpoints -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Prometheus metrics registry -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ==========================================================
+         BUILD CONFIGURATION
+         ========================================================== -->
+    <build>
+        <plugins>
+            <!-- Spring Boot Maven Plugin (packaging + run) -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

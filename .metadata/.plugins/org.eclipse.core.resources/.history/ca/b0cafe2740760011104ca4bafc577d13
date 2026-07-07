@@ -1,0 +1,32 @@
+
+
+#Every object in Kubernetes belongs to an API.
+apiVersion: apps/v1
+#This tells Kubernetes that I am creating a Deployment object.
+kind: Deployment
+
+metadata:
+  name: ms-wallet
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ms-wallet
+
+  template:
+    metadata:
+      labels:
+        app: ms-wallet
+
+    spec:
+      containers:
+        - name: wallet
+
+          image: ms-wallet:1.0
+
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 8081

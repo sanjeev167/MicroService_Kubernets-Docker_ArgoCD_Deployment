@@ -1,0 +1,48 @@
+# ==========================================================
+# Kubernetes ConfigMap
+# File      : config-map-observability.yaml
+# Project   : MSIMPL - Microservices Platform
+# Author    : Sanjeev Kumar
+#
+# Description
+# -----------
+# Stores common, non-sensitive observability configuration
+# shared across all MSIMPL microservices.
+#
+# Purpose
+# -------
+# - Spring Boot Actuator configuration
+# - Prometheus metrics configuration
+#
+# Notes
+# -----
+# - Logging configuration belongs to config-map-common.yaml
+# - Sensitive values must be stored in Kubernetes Secrets.
+#
+# ==========================================================
+
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: msimpl-observability-config
+  namespace: msimpl
+
+  labels:
+    app.kubernetes.io/name: msimpl
+    app.kubernetes.io/component: observability-config
+    app.kubernetes.io/part-of: microservices-platform
+
+data:
+
+  # --------------------------------------------------------
+  # Spring Boot Actuator
+  # --------------------------------------------------------
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus"
+
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "always"
+
+  # --------------------------------------------------------
+  # Prometheus
+  # --------------------------------------------------------
+  MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: "true"

@@ -1,0 +1,91 @@
+# ==========================================================
+# MSIMPL Kubernetes Deployment
+# Service    : ms-wallet
+# Namespace  : msimpl
+# Author     : Sanjeev Kumar
+#
+# Description
+# -----------
+# Deploys the Wallet Microservice into Kubernetes.
+#
+# Responsibilities
+# ----------------
+# - Maintains one Pod replica
+# - Uses the locally available Docker image
+# - Loads environment variables from ConfigMaps and Secret
+# - Exposes Spring Boot on port 8080
+# - Defines CPU and Memory requirements
+#
+# Notes
+# -----
+# - Uses the same Docker image created during Docker Phase
+# - No application rebuild required
+# - Supports externalized configuration
+# - Ready for future AWS EKS deployment
+#
+# Version History
+# ----------------
+# V1.0 | Initial Kubernetes Deployment
+# ==========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ms-wallet
+  namespace: msimpl
+  labels:
+    app: ms-wallet
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ms-wallet
+
+  template:
+
+    metadata:
+      labels:
+        app: ms-wallet
+
+    spec:
+
+      containers:
+
+        - name: ms-wallet
+
+          image: ms-wallet:1.0
+
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8080
+
+          envFrom:
+
+            - configMapRef:
+                name: msimpl-common-config
+
+            - configMapRef:
+                name: ms-wallet-db-config
+
+            - configMapRef:
+                name: msimpl-kafka-config
+
+            - configMapRef:
+                name: msimpl-observability-config
+
+            - secretRef:
+                name: msimpl-secret
+
+          resources:
+
+            requests:
+              cpu: "200m"
+              memory: "384Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "768Mi"

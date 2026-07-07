@@ -1,0 +1,42 @@
+# ==========================================================
+# FILE             : transaction-orchestrator.env
+# MODULE           : Transaction Orchestrator Docker Environment
+# PROJECT          : MSIMPL
+# ENVIRONMENT      : Docker
+# AUTHOR           : Sanjeev Kumar
+# CREATED ON       : 04-Jul-2026
+# VERSION          : 1.0.0
+# ==========================================================
+
+# ==========================================================
+# Docker Image
+# ==========================================================
+
+ORCHESTRATOR_IMAGE_NAME=ms-transaction-orchestrator
+
+ORCHESTRATOR_IMAGE_VERSION=1.0
+
+
+# ==========================================================
+# Container Configuration
+# ==========================================================
+
+ORCHESTRATOR_CONTAINER_NAME=ms-transaction-orchestrator
+
+ORCHESTRATOR_HOSTNAME=ms-transaction-orchestrator
+
+ORCHESTRATOR_RESTART=unless-stopped
+
+
+# ==========================================================
+# Port Configuration
+# ==========================================================
+
+ORCHESTRATOR_PORT=8082
+
+
+# ==========================================================
+# JVM Configuration
+# ==========================================================
+
+ORCHESTRATOR_JAVA_OPTS=-Xms256m -Xmx512m

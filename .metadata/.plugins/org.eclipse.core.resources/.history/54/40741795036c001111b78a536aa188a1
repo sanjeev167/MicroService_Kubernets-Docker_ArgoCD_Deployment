@@ -1,0 +1,174 @@
+# ==========================================================
+
+# DOCKER COMPOSE CONFIGURATION
+
+# ==========================================================
+
+# Author: Sanjeev
+
+# Date: 19-June-2026
+
+# Version: 3.8
+
+#
+
+# PURPOSE:
+
+# * Local development environment for Kafka ecosystem
+
+# * Includes Kafka (KRaft mode), Kafka UI, Prometheus, and Grafana
+
+# * Provides observability and monitoring for microservices
+
+#
+
+# DESIGN PRINCIPLES:
+
+# ✔ Self-contained stack for local testing
+
+# ✔ Clear separation of concerns (Kafka, UI, Monitoring)
+
+# ✔ Easy extension for additional microservices
+
+#
+
+# IMPROVEMENTS ADDED:
+
+# ✔ Auto topic creation (developer friendly)
+
+# ✔ Restart policies for stability
+
+# ✔ Persistent storage for Grafana dashboards
+
+# ==========================================================
+
+version: '3.8'
+
+services:
+
+# ==========================================================
+
+# 🟡 KAFKA (KRaft Mode)
+
+# ==========================================================
+
+kafka:
+image: confluentinc/cp-kafka:7.5.0
+container_name: kafka
+ports:
+- "9092:9092"     # Internal broker port (container-to-container)
+- "29092:29092"   # External access (localhost for apps)
+
+```
+environment:
+  # ------------------------------------------------------
+  # KRaft Configuration (Single Node)
+  # ------------------------------------------------------
+  CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+  KAFKA_PROCESS_ROLES: "broker,controller"
+  KAFKA_NODE_ID: 1
+  KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+
+  # ------------------------------------------------------
+  # Listener Configuration
+  # ------------------------------------------------------
+  # PLAINTEXT       → internal communication (docker network)
+  # PLAINTEXT_HOST  → external communication (localhost)
+  # CONTROLLER      → KRaft controller communication
+  # ------------------------------------------------------
+  KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093"
+  KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092"
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT"
+
+  KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+  KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+
+  # ------------------------------------------------------
+  # Storage & Replication
+  # ------------------------------------------------------
+  KAFKA_LOG_DIRS: "/tmp/kraft-combined-logs"
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # ------------------------------------------------------
+  # Developer Friendly Config (LOCAL ONLY)
+  # ------------------------------------------------------
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+restart: always
+```
+
+# ==========================================================
+
+# 🟠 KAFKA UI (Cluster Visualization)
+
+# ==========================================================
+
+kafka-ui:
+image: provectuslabs/kafka-ui
+container_name: kafka-ui
+ports:
+- "8085:8080"   # UI → http://localhost:8085
+
+```
+depends_on:
+  - kafka
+
+environment:
+  KAFKA_CLUSTERS_0_NAME: local
+  KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+restart: always
+```
+
+# ==========================================================
+
+# 🟢 PROMETHEUS (Metrics Collection)
+
+# ==========================================================
+
+prometheus:
+image: prom/prometheus
+container_name: prometheus
+ports:
+- "9090:9090"   # UI → http://localhost:9090
+
+```
+volumes:
+  - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+depends_on:
+  - kafka
+
+restart: always
+```
+
+# ==========================================================
+
+# 🔵 GRAFANA (Visualization Layer)
+
+# ==========================================================
+
+grafana:
+image: grafana/grafana
+container_name: grafana
+ports:
+- "3000:3000"   # UI → http://localhost:3000
+
+```
+depends_on:
+  - prometheus
+
+volumes:
+  - grafana-storage:/var/lib/grafana   # Persistent dashboards
+
+restart: always
+```
+
+# ==========================================================
+
+# 🔹 VOLUMES (Persistent Storage)
+
+# ==========================================================
+
+volumes:
+grafana-storage:

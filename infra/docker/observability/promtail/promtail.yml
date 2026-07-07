@@ -1,0 +1,291 @@
+# ==========================================================
+# PROMTAIL CONFIGURATION (DOCKER LOG COLLECTION AGENT)
+# ==========================================================
+# Author      : Sanjeev Kumar
+# Created On  : 04-Jul-2026
+# Environment : Docker
+# Project     : MSIMPL
+# Version     : 1.0.0
+#
+# ==========================================================
+# PURPOSE
+# ----------------------------------------------------------
+# * Collect application logs from the centralized host logs
+#   directory shared by all Dockerized microservices.
+# * Push logs to Loki for indexing and storage.
+# * Enable centralized log analysis using Grafana.
+#
+# ==========================================================
+# LOG FLOW ARCHITECTURE
+# ----------------------------------------------------------
+#
+#   Dockerized Spring Boot Microservices
+#                 │
+#                 ▼
+#        /app/logs/<service>.log
+#                 │
+#        Docker Bind Mount
+#                 │
+#                 ▼
+#     Host logs directory (shared)
+#                 │
+#                 ▼
+#       Mounted into Promtail
+#          (/var/log/app)
+#                 │
+#                 ▼
+#             Promtail
+#                 │
+#                 ▼
+#               Loki
+#                 │
+#                 ▼
+#             Grafana
+#
+# ==========================================================
+# DESIGN PRINCIPLES
+# ----------------------------------------------------------
+# ✔ Centralized host log directory
+# ✔ No application code changes
+# ✔ Container-independent logging
+# ✔ Lightweight log shipping
+# ✔ Automatic service identification using log filenames
+# ✔ Easily scalable for additional microservices
+#
+# ==========================================================
+# CRITICAL CONVENTIONS
+# ----------------------------------------------------------
+#
+# 1. Docker Volume Mapping
+#
+#    Every application container writes logs to:
+#
+#        /app/logs
+#
+#    Docker bind mount:
+#
+#        ../../../logs:/app/logs
+#
+#    Promtail mounts the same host directory:
+#
+#        ../../../logs:/var/log/app
+#
+# ----------------------------------------------------------
+#
+# 2. Log File Naming Convention
+#
+#    ms-wallet.log
+#    ms-notification.log
+#    ms-transaction-orchestrator.log
+#
+#    This naming convention is REQUIRED because
+#    Promtail derives the service label from
+#    the filename.
+#
+# ----------------------------------------------------------
+#
+# 3. Log Format
+#
+#    Current :
+#        Spring Boot plain text logs
+#
+#    Future :
+#        Structured JSON logging
+#
+# ==========================================================
+
+
+# ==========================================================
+# SERVER CONFIGURATION
+# ==========================================================
+#
+# Exposes Promtail HTTP endpoint for
+# health checking and troubleshooting.
+#
+server:
+  http_listen_port: 9080
+
+
+# ==========================================================
+# POSITION TRACKING
+# ==========================================================
+#
+# Tracks the last read position of each log file.
+#
+# Prevents duplicate ingestion after restart.
+#
+# Troubleshooting:
+#
+# docker exec -it promtail rm /tmp/positions.yaml
+#
+positions:
+  filename: /tmp/positions.yaml
+
+
+# ==========================================================
+# LOKI CLIENT CONFIGURATION
+# ==========================================================
+#
+# Promtail pushes logs to Loki using
+# Docker internal DNS.
+#
+# Requirement:
+#
+# Both containers must belong to:
+#
+#     infra_msimpl-network
+#
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+
+# ==========================================================
+# LOG SCRAPING CONFIGURATION
+# ==========================================================
+scrape_configs:
+
+  # ========================================================
+  # SPRING BOOT APPLICATION LOGS
+  # ========================================================
+  - job_name: spring-boot-logs
+
+    static_configs:
+
+      - targets:
+          - localhost     # Required dummy value
+
+        labels:
+
+          # Common Labels
+          job: msimpl
+          env: docker
+          type: application
+
+          # Log files inside Promtail container
+          __path__: /var/log/app/*.log
+
+
+    # ======================================================
+    # PIPELINE STAGES
+    # ======================================================
+    pipeline_stages:
+
+      # Extract service name
+      #
+      # Example:
+      #
+      # /var/log/app/ms-wallet.log
+      #
+      # becomes
+      #
+      # service=ms-wallet
+      #
+      - regex:
+          expression: '.*/(?P<service>[^/]+)\.log'
+
+      # Attach extracted value as Loki label
+      - labels:
+          service:
+
+      # Future Enhancement
+      #
+      # - json:
+      # - labels:
+      # - traceId
+      # - txnId
+      # - logLevel
+
+
+# ==========================================================
+# GRAFANA LOGQL EXAMPLES
+# ==========================================================
+#
+# All logs
+#
+#   {job="msimpl"}
+#
+# Wallet logs
+#
+#   {service="ms-wallet"}
+#
+# Error logs
+#
+#   {job="msimpl"} |= "ERROR"
+#
+# Transaction search
+#
+#   {job="msimpl"} |= "txnId="
+#
+# Wallet failures
+#
+#   {service="ms-wallet"} |= "FAILED"
+#
+# ==========================================================
+
+
+# ==========================================================
+# DEBUG / TROUBLESHOOTING
+# ==========================================================
+#
+# 1. Verify host logs
+#
+#    logs/
+#
+# 2. Verify Promtail mount
+#
+#    docker exec -it promtail sh
+#
+#    ls /var/log/app
+#
+# 3. Verify Promtail
+#
+#    docker logs promtail
+#
+# 4. Verify Loki
+#
+#    http://localhost:3100/ready
+#
+# 5. Verify labels
+#
+#    http://localhost:3100/loki/api/v1/labels
+#
+# 6. Verify Grafana
+#
+#    {job="msimpl"}
+#
+# ==========================================================
+
+
+# ==========================================================
+# COMMON PITFALLS
+# ==========================================================
+#
+# Logs not appearing
+#     -> Wrong Docker volume mapping
+#
+# Missing service label
+#     -> Filename convention broken
+#
+# "no such host loki"
+#     -> Containers not on infra_msimpl-network
+#
+# Logs not updating
+#     -> Application not generating logs
+#
+# Empty Grafana
+#     -> Wrong LogQL query or time range
+#
+# ==========================================================
+
+
+# ==========================================================
+# FUTURE ROADMAP
+# ==========================================================
+#
+# ✔ Structured JSON logging
+# ✔ TraceId propagation
+# ✔ Correlation between Logs and Metrics
+# ✔ Alerting on ERROR patterns
+# ✔ Service-specific Grafana dashboards
+#
+# ==========================================================

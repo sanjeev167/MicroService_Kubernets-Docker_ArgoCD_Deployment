@@ -1,0 +1,82 @@
+# ==========================================================
+# FILE             : postgres.env
+# MODULE           : PostgreSQL Environment Configuration
+# PROJECT          : MSIMPL - Microservices Platform (MSIMPL)
+# AUTHOR           : Sanjeev Kumar
+# CREATED ON       : 03-Jul-2026
+# LAST MODIFIED    : 03-Jul-2026
+# VERSION          : 1.0.0
+# ==========================================================
+#
+# PURPOSE
+# ----------------------------------------------------------
+# Centralized environment configuration for the PostgreSQL
+# Docker container.
+#
+# This file externalizes PostgreSQL-specific configuration
+# used by Docker Compose, allowing environment-specific
+# values to be maintained separately from infrastructure
+# definitions.
+#
+# DEPLOYMENT TARGET
+# ----------------------------------------------------------
+# ✔ Local Development (STS)
+#
+# Future Support
+# ----------------------------------------------------------
+# ✔ Docker Compose
+# ✔ Kubernetes
+# ✔ AWS EKS
+#
+# DESIGN PRINCIPLES
+# ----------------------------------------------------------
+# ✔ Environment-specific configuration
+# ✔ No hardcoded infrastructure values
+# ✔ Reusable across deployment environments
+# ✔ Single source of truth for PostgreSQL configuration
+#
+# VERSION HISTORY
+# ----------------------------------------------------------
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|--------------------------------------------
+# 1.0.0   | 03-Jul-2026 | Sanjeev Kumar  | Initial PostgreSQL environment configuration.
+#
+# ==========================================================
+
+
+# ==========================================================
+# PostgreSQL Database Configuration
+# ==========================================================
+#
+# Database Name
+# Default database created during container initialization.
+#
+# Database User
+# Default administrative user created by PostgreSQL.
+#
+# Database Password
+# Password for the default PostgreSQL user.
+#
+# ==========================================================
+
+POSTGRES_DB=wallet_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+
+# ==========================================================
+# PostgreSQL Storage Configuration
+# ==========================================================
+#
+# PostgreSQL Data Directory
+# Directory inside the container where PostgreSQL stores
+# database files, transaction logs and metadata.
+#
+# ==========================================================
+
+PGDATA=/var/lib/postgresql/data
+
+
+# ==========================================================
+# End Of File
+# ==========================================================

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ms-wallet
+  namespace: msimpl
+  labels:
+    app: ms-wallet
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ms-wallet
+
+  template:
+    metadata:
+      labels:
+        app: ms-wallet
+
+      spec:
+		  containers:
+		    - name: ms-wallet
+		      image: ms-wallet:1.0
+		      imagePullPolicy: IfNotPresent
+		
+		      ports:
+		        - containerPort: 8080
+		
+		      envFrom:
+		
+		        - configMapRef:
+		            name: msimpl-common-config
+		
+		        - configMapRef:
+		            name: ms-wallet-db-config
+		
+		        - configMapRef:
+		            name: msimpl-kafka-config
+		
+		        - configMapRef:
+		            name: msimpl-observability-config
+		
+		        - secretRef:
+		            name: msimpl-secret

@@ -1,0 +1,341 @@
+# =============================================================================
+# File Name   : application.yml
+# Module      : Bootstrap Configuration
+# Service     : MS Wallet Service
+# Project     : MSIMPL - Microservices Platform
+# Author      : Sanjeev Kumar
+# Created On  : 01-Jul-2026
+# Last Updated: 03-Jul-2026
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+#
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|------------------------------------------
+# 1.0.0   | 01-Jul-2026 | Sanjeev Kumar  | Initial bootstrap configuration.
+# 1.1.0   | 03-Jul-2026 | Sanjeev Kumar  | Refactored to modular configuration
+#         |             |                | architecture and standardized
+#         |             |                | documentation.
+#
+# =============================================================================
+# PURPOSE
+# =============================================================================
+#
+# Acts as the primary bootstrap configuration for the
+# MS Wallet Service.
+#
+# Its responsibility is intentionally limited to loading
+# core application configuration and importing modular
+# configuration files.
+#
+# All infrastructure-specific configuration is delegated
+# to dedicated configuration modules, allowing the same
+# application artifact to run across multiple deployment
+# environments.
+#
+# Responsibilities
+# ----------------
+# ✔ Service Identification
+# ✔ Server Configuration
+# ✔ Import Modular Configuration Files
+# ✔ Core JPA/Hibernate Configuration
+#
+# =============================================================================
+# CONFIGURATION ARCHITECTURE
+# =============================================================================
+#
+#                  application.yml
+#                         │
+#                         ▼
+#                Spring Environment
+#                         │
+#     ┌───────────────────┼───────────────────┐
+#     │                   │                   │
+#     ▼                   ▼                   ▼
+# application-db.yml application-kafka.yml application-observability.yml
+#     │                   │                   │
+#     ▼                   ▼                   ▼
+# Database          Event Streaming      Monitoring
+#
+#
+# Future Modules
+# --------------
+#
+# application-redis.yml
+# application-security.yml
+# application-service.yml
+#
+# Each module has a single responsibility and can evolve
+# independently without affecting the bootstrap configuration.
+#
+# =============================================================================
+# DESIGN PRINCIPLES
+# =============================================================================
+#
+# ✔ Single Responsibility
+#     Each configuration file manages one concern.
+#
+# ✔ Separation of Concerns
+#     Application configuration and infrastructure
+#     configuration remain independent.
+#
+# ✔ Environment Independence
+#     No environment-specific values are hardcoded.
+#
+#     Deployment environments override configuration
+#     using Environment Variables, ConfigMaps,
+#     Secrets or Spring Cloud Config.
+#
+# ✔ Write Once, Deploy Anywhere
+#
+#     The same application artifact is deployed to:
+#
+#     • Spring Tool Suite (STS)
+#     • Docker Compose
+#     • Kubernetes
+#     • AWS EKS
+#
+#     Only environment variables change.
+#
+# ✔ Maintainability
+#
+#     Small focused configuration modules are easier
+#     to understand, review and maintain.
+#
+# =============================================================================
+# MODULE RESPONSIBILITIES
+# =============================================================================
+#
+# application-db.yml
+# ------------------
+# • Database Connection
+# • JDBC Driver
+# • Connection Pool
+#
+#
+# application-kafka.yml
+# ---------------------
+# • Kafka Broker Configuration
+# • Producer Configuration
+# • Consumer Configuration
+# • Topic Configuration
+#
+#
+# application-observability.yml
+# -----------------------------
+# • Spring Boot Actuator
+# • Prometheus Metrics
+# • Health Endpoint
+# • Monitoring Configuration
+#
+#
+# application-redis.yml (Future)
+# ------------------------------
+# • Redis Connection
+# • Cache Configuration
+#
+#
+# application-security.yml (Future)
+# ---------------------------------
+# • JWT
+# • Authentication
+# • Authorization
+#
+#
+# application-service.yml (Future)
+# --------------------------------
+# • External Service URLs
+# • Timeout Configuration
+# • Retry Policies
+#
+# =============================================================================
+# MSIMPL DEPLOYMENT STANDARD
+# =============================================================================
+#
+# ✔ STS Ready
+# ✔ Docker Ready
+# ✔ Kubernetes Ready
+# ✔ AWS EKS Ready
+# ✔ Spring Cloud Config Ready
+#
+# Same application code.
+#
+# Same executable JAR.
+#
+# Same Docker image.
+#
+# Environment-specific behaviour is controlled only
+# through external configuration.
+#
+# =============================================================================
+
+server:
+
+  # ===========================================================================
+  # Application Server
+  # ===========================================================================
+  #
+  # HTTP server port.
+  #
+  # Default
+  # -------
+  # 8080 (STS)
+  #
+  # Docker / Kubernetes / AWS
+  # -------------------------
+  # Override using:
+  #
+  # SERVER_PORT
+  #
+  # ===========================================================================
+  port: ${SERVER_PORT:8080}
+
+
+spring:
+
+  # ===========================================================================
+  # Application Information
+  # ===========================================================================
+  #
+  # Logical service name.
+  #
+  # Used by:
+  #
+  # • Spring Boot
+  # • Logging
+  # • Prometheus Metric Tags
+  # • Grafana Dashboards
+  # • Service Discovery
+  #
+  # This value identifies the service itself and therefore
+  # should remain constant across all deployment environments.
+  #
+  application:
+
+    name: ms-wallet
+
+
+  # ===========================================================================
+  # Modular Configuration Import
+  # ===========================================================================
+  #
+  # Spring Boot imports and merges the following configuration
+  # modules during application startup.
+  #
+  # Benefits
+  # --------
+  # ✔ Better organization
+  # ✔ Easier maintenance
+  # ✔ Cleaner code reviews
+  # ✔ Environment-independent application
+  #
+  config:
+
+    import:
+
+      # Database Configuration
+      - classpath:config/application-db.yml
+
+      # Kafka Configuration
+      - classpath:config/application-kafka.yml
+
+      # Monitoring & Observability
+      - classpath:config/application-observability.yml
+
+      # Future Modules
+      # - classpath:config/application-redis.yml
+      # - classpath:config/application-security.yml
+      # - classpath:config/application-service.yml
+
+
+  # ===========================================================================
+  # JPA / Hibernate Configuration
+  # ===========================================================================
+  #
+  # Core persistence configuration.
+  #
+  # Database connection properties are maintained in:
+  #
+  #     application-db.yml
+  #
+  jpa:
+
+    hibernate:
+
+      # -----------------------------------------------------------------------
+      # Schema Generation Strategy
+      # -----------------------------------------------------------------------
+      #
+      # Development
+      #
+      #     update
+      #
+      # Production Recommendation
+      #
+      # Override using:
+      #
+      # SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      #
+      ddl-auto: update
+
+    # -------------------------------------------------------------------------
+    # SQL Logging
+    # -------------------------------------------------------------------------
+    #
+    # Development
+    #
+    #     true
+    #
+    # Production
+    #
+    # Override using:
+    #
+    # SHOW_SQL=false
+    #
+    show-sql: ${SHOW_SQL:true}
+
+
+# =============================================================================
+# DEPLOYMENT MODEL
+# =============================================================================
+#
+# Spring Tool Suite (STS)
+# -----------------------
+#
+# • Run directly from STS
+# • Uses default values from modular configuration files
+#
+#
+# Docker Compose
+# --------------
+#
+# • Same executable JAR
+# • Same configuration
+# • Environment variables override defaults
+#
+#
+# Kubernetes
+# ----------
+#
+# • Same Docker image
+# • Same application code
+#
+# Configuration supplied through:
+#
+# • ConfigMaps
+# • Secrets
+# • Environment Variables
+#
+#
+# AWS EKS
+# -------
+#
+# • Same deployment strategy
+# • No application rebuild
+# • No Docker image rebuild
+#
+# =============================================================================
+# End Of File
+# =============================================================================

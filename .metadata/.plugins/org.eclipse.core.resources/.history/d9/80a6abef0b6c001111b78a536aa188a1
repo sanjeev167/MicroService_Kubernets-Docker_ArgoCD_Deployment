@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ==========================================================
+     LOGGING CONFIGURATION (LOGBACK - FINAL)
+     ==========================================================
+     AUTHOR: Sanjeev Kumar
+     DATE:   June 16, 2026
+
+     PURPOSE:
+     - Centralized logging for microservices
+     - Enable tracing using traceId / txnId
+     - Support Loki (via Promtail file scraping)
+
+     IMPORTANT:
+     ✔ Loki DOES NOT read logs directly
+     ✔ Promtail reads log files
+     ✔ Therefore FILE APPENDER is mandatory
+
+========================================================== -->
+
+<configuration>
+
+```
+<!-- ===================================================== -->
+<!-- APPLICATION NAME -->
+<!-- ===================================================== -->
+<springProperty scope="context" name="appName" source="spring.application.name"/>
+
+<!-- ===================================================== -->
+<!-- LOG FILE NAME (Dynamic per service) -->
+<!-- ===================================================== -->
+<property name="LOG_FILE" value="/logs/${appName}.log"/>
+
+<!-- ===================================================== -->
+<!-- LOG PATTERN -->
+<!-- ===================================================== -->
+<property name="LOG_PATTERN"
+          value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [service=${appName}] [traceId=%X{traceId}] [txnId=%X{txnId}] - %msg%n"/>
+
+<!-- ===================================================== -->
+<!-- CONSOLE APPENDER -->
+<!-- ===================================================== -->
+<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+        <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+</appender>
+
+<!-- ===================================================== -->
+<!-- FILE APPENDER (MANDATORY FOR LOKI) -->
+<!-- ===================================================== -->
+<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+    <!-- Log file location -->
+    <file>${LOG_FILE}</file>
+
+    <!-- Rolling policy -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <!-- Daily log rotation -->
+        <fileNamePattern>logs/${appName}.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+        <!-- Keep logs for 7 days -->
+        <maxHistory>7</maxHistory>
+    </rollingPolicy>
+
+    <encoder>
+        <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+
+</appender>
+
+<!-- ===================================================== -->
+<!-- ROOT LOGGER -->
+<!-- ===================================================== -->
+<root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+</root>
+
+<!-- ===================================================== -->
+<!-- PACKAGE LEVEL LOGGING -->
+<!-- ===================================================== -->
+<logger name="org.springframework" level="WARN"/>
+<logger name="org.apache.kafka" level="WARN"/>
+```
+
+</configuration>

@@ -1,0 +1,42 @@
+# ==========================================================
+# FILE             : notification.env
+# MODULE           : Notification Docker Environment
+# PROJECT          : MSIMPL
+# ENVIRONMENT      : Docker
+# AUTHOR           : Sanjeev Kumar
+# CREATED ON       : 04-Jul-2026
+# VERSION          : 1.0.0
+# ==========================================================
+
+# ==========================================================
+# Docker Image
+# ==========================================================
+
+NOTIFICATION_IMAGE_NAME=ms-notification
+
+NOTIFICATION_IMAGE_VERSION=1.0
+
+
+# ==========================================================
+# Container Configuration
+# ==========================================================
+
+NOTIFICATION_CONTAINER_NAME=ms-notification
+
+NOTIFICATION_HOSTNAME=ms-notification
+
+NOTIFICATION_RESTART=unless-stopped
+
+
+# ==========================================================
+# Port Configuration
+# ==========================================================
+
+NOTIFICATION_PORT=8081
+
+
+# ==========================================================
+# JVM Configuration
+# ==========================================================
+
+NOTIFICATION_JAVA_OPTS=-Xms256m -Xmx512m

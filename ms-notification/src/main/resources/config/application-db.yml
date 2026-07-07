@@ -1,0 +1,194 @@
+# =============================================================================
+# File Name   : application-db.yml
+# Module      : Database Configuration
+# Service     : MS Notification Service
+# Project     : MSIMPL - Microservices Platform
+# Author      : Sanjeev Kumar
+# Created On  : 06-Jun-2026
+# Last Updated: 03-Jul-2026
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+#
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|------------------------------------------
+# 1.0.0   | 06-Jun-2026 | Sanjeev Kumar  | Initial database configuration.
+# 1.1.0   | 03-Jul-2026 | Sanjeev Kumar  | Refactored JDBC configuration to use
+#         |             |                | DB_HOST, DB_PORT and DB_NAME.
+#         |             |                | Standardized configuration for STS,
+#         |             |                | Docker, Kubernetes and AWS deployments.
+#
+# =============================================================================
+# PURPOSE
+# =============================================================================
+#
+# Centralized database configuration for the MS Notification Service.
+#
+# This configuration is designed to support multiple deployment
+# environments without requiring application code changes or
+# rebuilding the Docker image.
+#
+# Responsibilities
+# ----------------
+# ✔ Database Connection Configuration
+# ✔ JDBC Driver Configuration
+# ✔ Hikari Connection Pool Configuration
+# ✔ Environment-Independent Configuration
+#
+# =============================================================================
+# CONFIGURATION STRATEGY
+# =============================================================================
+#
+# Spring resolves configuration properties using:
+#
+#     ${VARIABLE_NAME:DefaultValue}
+#
+# Resolution Order
+# ----------------
+#
+# 1. Environment Variable
+# 2. System Property
+# 3. Default Value
+#
+# Example
+#
+#     ${DB_HOST:localhost}
+#
+# If DB_HOST is defined, Spring uses its value.
+# Otherwise, it falls back to localhost.
+#
+# =============================================================================
+# ENVIRONMENT SUPPORT
+# =============================================================================
+#
+# Spring Tool Suite (STS)
+# -----------------------
+#
+# No environment variables are required.
+#
+# Default configuration:
+#
+#     DB_HOST=localhost
+#     DB_PORT=5432
+#
+# PostgreSQL runs on the local machine.
+#
+#
+# Docker Compose
+# --------------
+#
+# Docker injects:
+#
+#     DB_HOST=host.docker.internal
+#
+# allowing containers to access PostgreSQL running on the
+# Windows host.
+#
+#
+# Kubernetes (Local)
+# ------------------
+#
+# When PostgreSQL runs outside the cluster:
+#
+#     DB_HOST=host.docker.internal
+#
+# When PostgreSQL runs inside Kubernetes:
+#
+#     DB_HOST=postgres-service
+#
+#
+# AWS EKS
+# -------
+#
+# Configuration is supplied through Kubernetes ConfigMaps
+# and Secrets.
+#
+# Example:
+#
+#     DB_HOST=notification-db.xxxxxx.ap-south-1.rds.amazonaws.com
+#
+#
+# =============================================================================
+# ENVIRONMENT VARIABLES
+# =============================================================================
+#
+# DB_HOST
+#     Database server hostname.
+#
+# DB_PORT
+#     PostgreSQL server port.
+#
+# DB_NAME
+#     Database name.
+#
+# DB_USERNAME
+#     Database username.
+#
+# DB_PASSWORD
+#     Database password.
+#
+# =============================================================================
+# HIKARI CONNECTION POOL
+# =============================================================================
+#
+# Connection Pool  : HikariCP
+# Maximum Pool Size: 10
+# Minimum Idle     : 2
+# Idle Timeout     : 30000 ms
+#
+# =============================================================================
+# MSIMPL DEPLOYMENT STANDARD
+# =============================================================================
+#
+# ✔ STS Ready
+# ✔ Docker Ready
+# ✔ Kubernetes Ready
+# ✔ AWS EKS Ready
+# ✔ Spring Cloud Config Ready
+#
+# The application code and Docker image remain unchanged
+# across all environments.
+#
+# Only environment variables differ between deployments.
+#
+# =============================================================================
+
+db:
+
+  datasource:
+
+    # =========================================================================
+    # JDBC Connection URL
+    # =========================================================================
+    #
+    # The JDBC URL is dynamically constructed using environment variables.
+    #
+    # Default values support Spring Tool Suite (STS).
+    #
+    # Other deployment environments override these values through
+    # Docker Compose, Kubernetes ConfigMaps or Secrets.
+    #
+    # =========================================================================
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:notification_db}
+
+    # Database Credentials
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+    # PostgreSQL JDBC Driver
+    driver-class-name: org.postgresql.Driver
+
+    # =========================================================================
+    # Hikari Connection Pool Configuration
+    # =========================================================================
+    pool:
+
+      max-size: 10
+      min-idle: 2
+      idle-timeout: 30000
+
+# =============================================================================
+# End Of File
+# =============================================================================

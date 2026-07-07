@@ -1,0 +1,82 @@
+# ==========================================================
+# PROMTAIL CONFIGURATION (LOG COLLECTION AGENT)
+# ==========================================================
+# Author: Sanjeev
+# Date: 19-June-2026
+#
+# PURPOSE:
+# * Collect logs from filesystem
+# * Push logs to Loki
+# * Enable centralized logging via Grafana
+#
+# FLOW:
+# logs/*.log → Promtail → Loki → Grafana
+#
+# ==========================================================
+
+# ==========================================================
+# SERVER CONFIGURATION
+# ==========================================================
+server:
+  http_listen_port: 9080
+
+# ==========================================================
+# POSITION TRACKING (OFFSET MANAGEMENT)
+# ==========================================================
+positions:
+  filename: /tmp/positions.yaml
+
+# ==========================================================
+# LOKI CLIENT CONFIGURATION
+# ==========================================================
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+# ==========================================================
+# SCRAPE CONFIGURATION
+# ==========================================================
+scrape_configs:
+
+  # ========================================================
+  # SPRING BOOT MICROSERVICE LOGS
+  # ========================================================
+  - job_name: spring-boot-logs
+
+    static_configs:
+      - targets:
+          - localhost
+
+        labels:
+          # Logical grouping (used in Grafana queries)
+          job: msimpl
+
+          # Environment label
+          env: local
+
+          # Log type
+          type: application
+
+          # --------------------------------------------------
+          # IMPORTANT: Log file path INSIDE container
+          # --------------------------------------------------
+          __path__: /var/log/app/*.log
+
+# ==========================================================
+# DEBUG / VERIFICATION NOTES
+# ==========================================================
+# ✔ Ensure Docker volume mapping:
+#   host logs folder → /var/log/app
+#
+# ✔ Verify inside container:
+#   docker exec -it promtail sh
+#   ls /var/log/app
+#
+# ✔ Check Promtail logs:
+#   docker logs promtail
+#
+# ✔ Grafana query:
+#   {job="msimpl"}
+#
+# ✔ Trace specific transaction:
+#   {job="msimpl"} |= "txnId=123"
+# ==========================================================

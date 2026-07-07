@@ -1,0 +1,237 @@
+# =============================================================================
+# File Name   : application-kafka.yml
+# Module      : Kafka Configuration
+# Service     : MS Wallet Service
+# Project     : Microservices Platform (MSIMPL)
+# Author      : Sanjeev Kumar
+# Created On  : 30-Jun-2026
+# Last Updated: 03-Jul-2026
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+#
+# Version | Date       | Author         | Description
+# --------|------------|----------------|-----------------------------------------
+# 1.0     | 30-Jun-2026| Sanjeev Kumar  | Initial Kafka Configuration.
+#
+# 1.1     | 03-Jul-2026| Sanjeev Kumar  | Refactored bootstrap server configuration
+#         |            |                | to use KAFKA_HOST and KAFKA_PORT for
+#         |            |                | environment-independent deployment across
+#         |            |                | STS, Docker, Kubernetes and AWS.
+#
+# =============================================================================
+# PURPOSE
+# =============================================================================
+#
+# Centralized Kafka configuration for Wallet Service.
+#
+# Responsibilities
+# ----------------
+# ✓ Kafka Broker Configuration
+# ✓ Producer Configuration
+# ✓ Consumer Configuration
+# ✓ Topic Configuration
+# ✓ Consumer Group Configuration
+#
+# =============================================================================
+# DESIGN PRINCIPLE
+# =============================================================================
+#
+# Kafka broker configuration is environment independent.
+#
+# Instead of hardcoding broker addresses,
+# host and port are supplied using environment variables.
+#
+# Spring Property Resolution
+#
+#     ${VARIABLE_NAME:DefaultValue}
+#
+# Resolution Order
+#
+#     1. If environment variable exists
+#            ↓
+#        Use its value
+#
+#     2. Otherwise
+#            ↓
+#        Use the default value.
+#
+# =============================================================================
+# ENVIRONMENT CONFIGURATION
+# =============================================================================
+#
+# Local Development (STS)
+# -----------------------
+#
+# KAFKA_HOST=localhost
+# KAFKA_PORT=29092
+#
+# localhost correctly points to Kafka running on the Windows host.
+#
+#
+# Docker Container
+# ----------------
+#
+# Default
+#
+#     host.docker.internal
+#
+# Inside a Docker container,
+# localhost refers to the container itself.
+#
+# Docker provides
+#
+#     host.docker.internal
+#
+# to access services running on the Windows host.
+#
+#
+# Kubernetes (Docker Desktop)
+# ---------------------------
+#
+# Default
+#
+#     host.docker.internal
+#
+# allows Pods to communicate with Kafka running
+# on the Windows host machine.
+#
+#
+# Kubernetes (Production)
+# -----------------------
+#
+# KAFKA_HOST=kafka-service
+# KAFKA_PORT=9092
+#
+# where kafka-service is the Kubernetes Service
+# exposing the Kafka broker.
+#
+#
+# AWS EKS
+# -------
+#
+# KAFKA_HOST=<Amazon MSK Endpoint>
+# KAFKA_PORT=9092
+#
+# Values are supplied using ConfigMaps or Secrets.
+#
+# =============================================================================
+# ENVIRONMENT VARIABLES
+# =============================================================================
+#
+# KAFKA_HOST
+#     Kafka Broker Host
+#
+# KAFKA_PORT
+#     Kafka Broker Port
+#
+# =============================================================================
+# MSIMPL INFRASTRUCTURE STANDARD (LOCKED)
+# =============================================================================
+#
+# ✓ Environment Independent
+# ✓ STS Ready
+# ✓ Docker Ready
+# ✓ Kubernetes Ready
+# ✓ AWS EKS Ready
+#
+# Same application.
+# Same Docker image.
+#
+# Only environment variables change.
+#
+# =============================================================================
+
+spring:
+
+  kafka:
+
+    # =========================================================================
+    # Kafka Bootstrap Server
+    #
+    # The broker address is dynamically constructed from environment variables.
+    #
+    # Local Kubernetes / Docker Desktop
+    # ---------------------------------
+    # Uses host.docker.internal by default to connect to Kafka running on the
+    # Windows host.
+    #
+    # STS
+    # ---
+    # Override:
+    #
+    #     KAFKA_HOST=localhost
+    #
+    # AWS
+    # ---
+    # Override using ConfigMap or Secret.
+    # =========================================================================
+    bootstrap-servers: ${KAFKA_HOST:host.docker.internal}:${KAFKA_PORT:29092}
+
+    # ======================================================
+    # Producer Configuration
+    # ======================================================
+
+    producer:
+
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      acks: all
+
+      retries: 3
+
+      properties:
+
+        spring.json.add.type.headers: false
+
+    # ======================================================
+    # Consumer Configuration
+    # ======================================================
+
+    consumer:
+
+      group-id: default-wallet-group
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      enable-auto-commit: false
+
+      auto-offset-reset: earliest
+
+      # ----------------------------------------------------
+      # MSIMPL Standard
+      # ----------------------------------------------------
+      #
+      # DO NOT USE JsonDeserializer
+      #
+      # Raw JSON is parsed manually using ObjectMapper.
+      #
+      # ----------------------------------------------------
+
+# ==========================================================
+# Wallet Topic Configuration
+# ==========================================================
+
+wallet:
+
+  topic:
+
+    request: wallet-request-topic
+
+    response: wallet-response-topic
+
+    compensation: wallet-compensation-topic
+
+  consumer:
+
+    group-id: wallet-consumer-group
+
+# ==========================================================
+# End Of File
+# ==========================================================

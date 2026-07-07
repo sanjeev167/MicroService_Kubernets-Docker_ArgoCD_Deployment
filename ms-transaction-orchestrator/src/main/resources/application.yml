@@ -1,0 +1,137 @@
+# =============================================================================
+# File Name   : application.yml
+# Module      : Bootstrap Configuration
+# Service     : MS Transaction Orchestrator Service
+# Project     : MSIMPL - Microservices Platform
+# Author      : Sanjeev Kumar
+# Created On  : 06-Jun-2026
+# Last Updated: 03-Jul-2026
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+#
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|------------------------------------------
+# 1.0.0   | 06-Jun-2026 | Sanjeev Kumar  | Initial bootstrap configuration.
+# 1.1.0   | 03-Jul-2026 | Sanjeev Kumar  | Adopted MSIMPL standard modular
+#         |             |                | configuration architecture with
+#         |             |                | environment-independent deployment.
+#
+# =============================================================================
+# PURPOSE
+# =============================================================================
+#
+# Acts as the primary bootstrap configuration for the
+# MS Transaction Orchestrator Service.
+#
+# Its responsibility is intentionally limited to loading
+# core application configuration and importing modular
+# configuration files.
+#
+# All infrastructure-specific configuration is delegated
+# to dedicated configuration modules, allowing the same
+# application artifact to run across multiple deployment
+# environments.
+#
+# Responsibilities
+# ----------------
+# ✔ Service Identification
+# ✔ Server Configuration
+# ✔ Import Modular Configuration Files
+# ✔ Core JPA/Hibernate Configuration
+#
+# =============================================================================
+# CONFIGURATION ARCHITECTURE
+# =============================================================================
+#
+#                  application.yml
+#                         │
+#                         ▼
+#                Spring Environment
+#                         │
+#     ┌───────────────────┼───────────────────┐
+#     │                   │                   │
+#     ▼                   ▼                   ▼
+# application-db.yml application-kafka.yml application-observability.yml
+#     │                   │                   │
+#     ▼                   ▼                   ▼
+# Database          Event Streaming      Monitoring
+#
+# Future Modules
+# --------------
+#
+# application-redis.yml
+# application-security.yml
+# application-service.yml
+#
+# =============================================================================
+# DESIGN PRINCIPLES
+# =============================================================================
+#
+# ✔ Single Responsibility
+# ✔ Separation of Concerns
+# ✔ Environment Independence
+# ✔ Write Once, Deploy Anywhere
+# ✔ Maintainability
+#
+# =============================================================================
+
+server:
+
+  port: ${SERVER_PORT:8082}
+
+spring:
+
+  application:
+
+    name: ms-transaction-orchestrator
+
+  config:
+
+    import:
+
+      # Database Configuration
+      - classpath:config/application-db.yml
+
+      # Kafka Configuration
+      - classpath:config/application-kafka.yml
+
+      # Monitoring & Observability
+      - classpath:config/application-observability.yml
+
+      # Future Modules
+      # - classpath:config/application-redis.yml
+      # - classpath:config/application-security.yml
+      # - classpath:config/application-service.yml
+
+  jpa:
+
+    hibernate:
+
+      ddl-auto: update
+
+    show-sql: ${SHOW_SQL:true}
+
+# =============================================================================
+# DEPLOYMENT MODEL
+# =============================================================================
+#
+# Spring Tool Suite (STS)
+#
+# Docker Compose
+#
+# Kubernetes
+#
+# AWS EKS
+#
+# Same executable JAR.
+#
+# Same Docker image.
+#
+# Only environment variables change.
+#
+# =============================================================================
+# End Of File
+# =============================================================================

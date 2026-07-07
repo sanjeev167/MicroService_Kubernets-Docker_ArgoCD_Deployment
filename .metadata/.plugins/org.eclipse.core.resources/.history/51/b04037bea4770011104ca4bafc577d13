@@ -1,0 +1,59 @@
+# ==========================================================
+# FILE             : wallet.env
+# MODULE           : Wallet Docker Environment
+# PROJECT          : MSIMPL
+# ENVIRONMENT      : Docker
+# AUTHOR           : Sanjeev Kumar
+# CREATED ON       : 04-Jul-2026
+# VERSION          : 1.0.0
+# ==========================================================
+
+# ==========================================================
+# Docker Image
+# ==========================================================
+
+WALLET_IMAGE_NAME=ms-wallet
+
+WALLET_IMAGE_VERSION=0.0.1-SNAPSHOT
+
+# Spring Boot Runtime
+DB_HOST=host.docker.internal
+DB_PORT=5432
+DB_NAME=wallet_db
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+
+# ==========================================================
+# Kafka Configuration
+# ==========================================================
+
+KAFKA_HOST=kafka
+
+KAFKA_PORT=9092
+
+
+LOG_PATH=/logs
+
+# ==========================================================
+# Container Configuration
+# ==========================================================
+
+WALLET_CONTAINER_NAME=ms-wallet
+
+WALLET_HOSTNAME=ms-wallet
+
+WALLET_RESTART=unless-stopped
+
+
+# ==========================================================
+# Port Configuration
+# ==========================================================
+
+WALLET_PORT=8080
+
+
+# ==========================================================
+# JVM Configuration
+# ==========================================================
+
+WALLET_JAVA_OPTS=-Xms256m -Xmx512m

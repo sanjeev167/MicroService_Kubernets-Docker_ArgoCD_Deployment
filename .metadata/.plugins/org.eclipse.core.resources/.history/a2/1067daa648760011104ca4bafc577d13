@@ -1,0 +1,145 @@
+# ==========================================================
+# Database Configuration
+# Service : ms-wallet
+# File    : application-db.yml
+# Author  : Sanjeev Kumar
+# Date    : 2026-06-30
+#
+# ==========================================================
+# PURPOSE
+# ==========================================================
+#
+# Centralized Database configuration for Wallet Service.
+#
+# Responsibilities
+#
+# ✔ Database Connection Configuration
+# ✔ Connection Pool Configuration
+# ✔ Database Driver Configuration
+#
+# ==========================================================
+# DESIGN PRINCIPLE
+# ==========================================================
+#
+# All environment specific properties are externalized
+# using Spring Environment Variables.
+#
+# Default Configuration
+#
+#     Host      : localhost
+#     Port      : 5432
+#     Database  : wallet_db
+#
+# Docker
+#
+#     Host      : host.docker.internal
+#                 OR
+#                 postgres (when PostgreSQL runs as container)
+#
+# Kubernetes
+#
+#     Host      : postgres-service
+#
+# AWS
+#
+#     Host      : Amazon RDS Endpoint
+#
+# No source code changes are required.
+#
+# Only environment variables change.
+#
+# ==========================================================
+# ENVIRONMENT VARIABLES
+# ==========================================================
+#
+# DB_URL
+# DB_USERNAME
+# DB_PASSWORD
+#
+# Examples
+#
+# STS
+#
+#   DB_URL=jdbc:postgresql://localhost:5432/wallet_db
+#
+# Docker
+#
+#   DB_URL=jdbc:postgresql://host.docker.internal:5432/wallet_db
+#
+# Docker (Containerized PostgreSQL)
+#
+#   DB_URL=jdbc:postgresql://postgres:5432/wallet_db
+#
+# Kubernetes
+#
+#   DB_URL=jdbc:postgresql://postgres-service:5432/wallet_db
+#
+# AWS
+#
+#   DB_URL=jdbc:postgresql://wallet-db.xxxxxx.ap-south-1.rds.amazonaws.com:5432/wallet_db
+#
+# ==========================================================
+# CONNECTION POOL
+# ==========================================================
+#
+# Connection Pool : HikariCP
+#
+# Initial Connections : Managed Automatically
+#
+# Maximum Pool Size : 10
+#
+# Minimum Idle Connections : 2
+#
+# Idle Timeout : 30000 ms
+#
+# ==========================================================
+# MSIMPL CONFIGURATION STANDARD (LOCKED)
+# ==========================================================
+#
+# ✔ Environment Independent
+# ✔ Docker Ready
+# ✔ Kubernetes Ready
+# ✔ AWS Ready
+# ✔ Spring Cloud Config Ready
+#
+# DO NOT hardcode
+#
+#   localhost
+#   username
+#   password
+#
+# Always use environment variables.
+#
+# ==========================================================
+
+db:
+
+  datasource:
+
+    # ======================================================
+    # Database Connection
+    # ======================================================
+
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/wallet_db}
+
+    username: ${DB_USERNAME:postgres}
+
+    password: ${DB_PASSWORD:postgres}
+
+    driver-class-name: org.postgresql.Driver
+
+    # ======================================================
+    # Hikari Connection Pool
+    # ======================================================
+
+    pool:
+
+      max-size: 10
+
+      min-idle: 2
+
+      idle-timeout: 30000
+
+# ==========================================================
+# End Of File
+# ==========================================================

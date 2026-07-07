@@ -1,0 +1,51 @@
+# ==========================================================
+# Kubernetes ConfigMap
+# File      : config-map-database.yaml
+# Project   : MSIMPL - Microservices Platform
+# Author    : Sanjeev Kumar
+#
+# Description
+# -----------
+# Stores common, non-sensitive database configuration shared
+# across all MSIMPL microservices.
+#
+# Purpose
+# -------
+# - Database Host
+# - Database Port
+# - Database Name
+#
+# Notes
+# -----
+# - Database username and password must NOT be stored here.
+# - Sensitive database credentials must be stored in
+#   Kubernetes Secrets.
+# - Spring Boot reads these values through environment
+#   variables defined in application-db.yml.
+#
+# ==========================================================
+
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: msimpl-database-config
+  namespace: msimpl
+
+  labels:
+    app.kubernetes.io/name: msimpl
+    app.kubernetes.io/component: database-config
+    app.kubernetes.io/part-of: microservices-platform
+
+data:
+
+  # --------------------------------------------------------
+  # PostgreSQL Connection
+  # --------------------------------------------------------
+  DB_HOST: "host.docker.internal"
+
+  DB_PORT: "5432"
+
+  DB_NAME: "wallet_db"
+
+  

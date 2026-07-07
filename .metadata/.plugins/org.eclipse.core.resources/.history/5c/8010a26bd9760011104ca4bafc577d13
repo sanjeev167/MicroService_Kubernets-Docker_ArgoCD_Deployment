@@ -1,0 +1,4 @@
+2026-07-03 00:33:47.093 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Pausing ProtocolHandler ["http-nio-8081"]
+2026-07-03 00:33:47.294 [RMI TCP Connection(793)-127.0.0.1] INFO  o.a.coyote.http11.Http11NioProtocol [service=ms-notification] [traceId=] [txnId=] - Stopping ProtocolHandler ["http-nio-8081"]
+2026-07-03 00:33:47.505 [RMI TCP Connection(793)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Shutdown initiated...
+2026-07-03 00:33:47.531 [RMI TCP Connection(793)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource [service=ms-notification] [traceId=] [txnId=] - HikariPool-1 - Shutdown completed.

@@ -1,0 +1,189 @@
+# =============================================================================
+# File Name   : application-kafka.yml
+# Module      : Apache Kafka Configuration
+# Service     : MS Transaction Orchestrator Service
+# Project     : MSIMPL - Microservices Platform
+# Author      : Sanjeev Kumar
+# Created On  : 06-Jun-2026
+# Last Updated: 03-Jul-2026
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+#
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|------------------------------------------
+# 1.0.0   | 06-Jun-2026 | Sanjeev Kumar  | Initial Kafka configuration.
+# 1.1.0   | 03-Jul-2026 | Sanjeev Kumar  | Refactored Kafka configuration for
+#         |             |                | modular architecture and
+#         |             |                | environment-independent deployment.
+#
+# =============================================================================
+# PURPOSE
+# =============================================================================
+#
+# Centralized Apache Kafka configuration for the
+# MS Transaction Orchestrator Service.
+#
+# This service coordinates Saga transactions across
+# multiple microservices.
+#
+# Responsibilities
+# ----------------
+# ✔ Kafka Broker Configuration
+# ✔ Producer Configuration
+# ✔ Consumer Configuration
+# ✔ Saga Topic Configuration
+# ✔ Listener Group Configuration
+#
+# =============================================================================
+# CONFIGURATION STRATEGY
+# =============================================================================
+#
+# Spring resolves configuration properties using:
+#
+#     ${VARIABLE_NAME:DefaultValue}
+#
+# Default values support STS.
+#
+# Docker, Kubernetes and AWS override values using
+# Environment Variables, ConfigMaps or Secrets.
+#
+# =============================================================================
+# MSIMPL PHASE-1 STANDARD (LOCKED)
+# =============================================================================
+#
+# Kafka Consumption Strategy
+# --------------------------
+#
+# ✔ Raw JSON (String) Consumption
+# ✔ Manual Jackson ObjectMapper Parsing
+# ✔ Manual Acknowledgement
+# ✔ Retry Ready
+# ✔ Dead Letter Queue (DLQ) Ready
+#
+# IMPORTANT
+# ---------
+#
+# The Orchestrator contains multiple Kafka listeners.
+#
+# Therefore:
+#
+# ✔ NO global consumer group is configured.
+#
+# Each @KafkaListener defines its own groupId.
+#
+# This allows independent consumption of Wallet,
+# Notification and Compensation events.
+#
+# DO NOT introduce:
+#
+# spring.kafka.consumer.group-id
+#
+# unless the listener architecture is redesigned.
+#
+# =============================================================================
+
+spring:
+
+  kafka:
+
+    # =========================================================================
+    # Kafka Bootstrap Server
+    # =========================================================================
+
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:29092}
+
+    # =========================================================================
+    # Producer Configuration
+    # =========================================================================
+
+    producer:
+
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      acks: all
+
+      retries: 3
+
+      properties:
+
+        spring.json.add.type.headers: false
+
+    # =========================================================================
+    # Consumer Configuration
+    # =========================================================================
+
+    consumer:
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      enable-auto-commit: false
+
+      auto-offset-reset: earliest
+
+      # -----------------------------------------------------------------------
+      # MSIMPL Standard
+      # -----------------------------------------------------------------------
+      #
+      # DO NOT configure:
+      #
+      #     spring.kafka.consumer.group-id
+      #
+      # Each listener supplies its own groupId.
+      #
+      # Messages are consumed as raw JSON Strings
+      # and manually converted using Jackson ObjectMapper.
+      #
+      # -----------------------------------------------------------------------
+
+# =============================================================================
+# Wallet Topic Configuration
+# =============================================================================
+
+wallet:
+
+  topic:
+
+    request: wallet-request-topic
+
+    response: wallet-response-topic
+
+    compensation-request: wallet-compensation-request-topic
+
+    compensation-response: wallet-compensation-response-topic
+
+# =============================================================================
+# Notification Topic Configuration
+# =============================================================================
+
+notification:
+
+  topic:
+
+    request: notification-request-topic
+
+    response: notification-response-topic
+
+# =============================================================================
+# Orchestrator Consumer Groups
+# =============================================================================
+
+orchestrator:
+
+  consumer:
+
+    wallet-response-group: orchestrator-wallet-response-group
+
+    notification-response-group: orchestrator-notification-response-group
+
+    compensation-response-group: wallet-compensation-response-group
+
+# =============================================================================
+# End Of File
+# =============================================================================

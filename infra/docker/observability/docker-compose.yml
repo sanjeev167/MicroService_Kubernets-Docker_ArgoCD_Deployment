@@ -1,0 +1,297 @@
+# ==========================================================
+# FILE             : docker-compose.yml
+# MODULE           : Docker Observability Stack
+# PROJECT          : Microservices Platform (MSIMPL)
+# ENVIRONMENT      : Docker
+# AUTHOR           : Sanjeev Kumar
+# CREATED ON       : 04-Jul-2026
+# LAST MODIFIED    : 04-Jul-2026
+# VERSION          : 1.0.0
+# ==========================================================
+#
+# PURPOSE
+# ----------------------------------------------------------
+# Provides the complete observability platform for the
+# Docker deployment environment.
+#
+# All Spring Boot microservices execute as Docker containers
+# and are monitored using Prometheus, Grafana, Loki and
+# Promtail.
+#
+#
+# INCLUDED SERVICES
+# ----------------------------------------------------------
+# ✔ Prometheus
+# ✔ Grafana
+# ✔ Loki
+# ✔ Promtail
+#
+#
+# MONITORED SERVICES
+# ----------------------------------------------------------
+# ✔ ms-wallet
+# ✔ ms-notification
+# ✔ ms-transaction-orchestrator
+#
+# Additional microservices can be monitored by updating
+# the Prometheus scrape configuration.
+#
+#
+# EXCLUDED SERVICES
+# ----------------------------------------------------------
+# ✘ PostgreSQL (Host Machine)
+# ✘ Apache Kafka Infrastructure
+# ✘ Kafka UI
+#
+#
+# OBSERVABILITY ARCHITECTURE
+# ----------------------------------------------------------
+#
+#                DOCKER ENVIRONMENT
+#
+#
+# Metrics Flow
+#
+#      Spring Boot Containers
+#               │
+#               ▼
+#     /actuator/prometheus
+#               │
+#               ▼
+#          Prometheus
+#               │
+#               ▼
+#            Grafana
+#
+#
+# Logs Flow
+#
+#      Spring Boot Containers
+#               │
+#               ▼
+#       /app/logs/*.log
+#               │
+#       Docker Bind Mount
+#               │
+#               ▼
+#      Host logs directory
+#               │
+#               ▼
+#           Promtail
+#               │
+#               ▼
+#              Loki
+#               │
+#               ▼
+#            Grafana
+#
+#
+# DEPLOYMENT TARGET
+# ----------------------------------------------------------
+# ✔ Docker Environment
+#
+#
+# CONFIGURATION
+# ----------------------------------------------------------
+#
+# Prometheus
+#     ./prometheus/prometheus.yml
+#
+# Promtail
+#     ./promtail/promtail.yml
+#
+# Loki
+#     Default configuration bundled with
+#     grafana/loki image.
+#
+#
+# NETWORK STRATEGY
+# ----------------------------------------------------------
+# All application containers and observability containers
+# communicate through the shared Docker network:
+#
+#     infra_msimpl-network
+#
+# Docker DNS provides service discovery.
+#
+# Example:
+#
+#     ms-wallet:8080
+#     ms-notification:8081
+#     ms-transaction-orchestrator:8082
+#     prometheus:9090
+#     loki:3100
+#     grafana:3000
+#
+#
+# STORAGE STRATEGY
+# ----------------------------------------------------------
+#
+# Metrics
+#     Prometheus
+#
+# Logs
+#     Host logs directory
+#
+# Dashboards
+#     Docker Volume (grafana-storage)
+#
+#
+# DESIGN PRINCIPLES
+# ----------------------------------------------------------
+# ✔ Independent observability stack
+# ✔ Centralized metrics collection
+# ✔ Centralized log aggregation
+# ✔ Shared Docker network
+# ✔ Centralized host log directory
+# ✔ Persistent Grafana storage
+# ✔ Same observability architecture as STS
+# ✔ Environment-specific infrastructure only
+#
+#
+# VERSION HISTORY
+# ----------------------------------------------------------
+# Version | Date        | Author         | Description
+# --------|-------------|----------------|-----------------------------------------
+# 1.0.0   | 04-Jul-2026 | Sanjeev Kumar  | Docker observability stack.
+#
+# ==========================================================
+
+version: "3.8"
+
+services:
+
+  # ==========================================================
+  # 🟢 PROMETHEUS
+  # ==========================================================
+  #
+  # Collects metrics exposed by Spring Boot Actuator.
+  #
+  # ==========================================================
+  prometheus:
+
+    image: prom/prometheus
+
+    container_name: prometheus
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+    networks:
+      - infra_msimpl-network
+
+    restart: unless-stopped
+
+
+  # ==========================================================
+  # 🔵 GRAFANA
+  # ==========================================================
+  #
+  # Visualization platform for metrics and logs.
+  #
+  # Datasources are configured manually using
+  # the Grafana Web UI.
+  #
+  # ==========================================================
+  grafana:
+
+    image: grafana/grafana
+
+    container_name: grafana
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+    depends_on:
+      - prometheus
+      - loki
+
+    networks:
+      - infra_msimpl-network
+
+    restart: unless-stopped
+
+
+  # ==========================================================
+  # 🟣 LOKI
+  # ==========================================================
+  #
+  # Centralized log storage.
+  #
+  # Uses the default Loki configuration bundled with the
+  # official Docker image.
+  #
+  # ==========================================================
+  loki:
+
+    image: grafana/loki:2.9.2
+
+    container_name: loki
+
+    ports:
+      - "3100:3100"
+
+    command: -config.file=/etc/loki/local-config.yaml
+
+    networks:
+      - infra_msimpl-network
+
+    restart: unless-stopped
+
+
+  # ==========================================================
+  # 🟠 PROMTAIL
+  # ==========================================================
+  #
+  # Collects application log files and pushes them to Loki.
+  #
+  # ==========================================================
+  promtail:
+
+    image: grafana/promtail:2.9.2
+
+    container_name: promtail
+
+    command: -config.file=/etc/promtail/config.yml
+
+    volumes:
+      - ./promtail/promtail.yml:/etc/promtail/config.yml
+      - ../../../logs:/var/log/app
+
+    depends_on:
+      - loki
+
+    networks:
+      - infra_msimpl-network
+
+    restart: unless-stopped
+
+
+# ==========================================================
+# NETWORK CONFIGURATION
+# ==========================================================
+
+networks:
+
+  infra_msimpl-network:
+    external: true
+
+
+# ==========================================================
+# PERSISTENT VOLUMES
+# ==========================================================
+
+volumes:
+
+  grafana-storage:
+
+
+# ==========================================================
+# END OF FILE
+# ==========================================================
