@@ -1,4 +1,36 @@
-name: Wallet_Workflow
+# =============================================================================
+# GitHub Actions - Continuous Integration (CI)
+# =============================================================================
+# File        : ms-wallet-ci.yml
+# Project     : MSIMPL - Microservices Platform
+# Service     : ms-wallet
+# Purpose     : Verify GitHub Actions workflow execution.
+# Environment : GitHub Actions
+# Version     : 1.0.0
+# =============================================================================
+#
+# Phase
+# -----
+# Initial CI verification.
+#
+# This workflow is intentionally simple and is used to verify that:
+# - GitHub Actions is enabled for the repository.
+# - Workflow execution is triggered on every push to the main branch.
+# - The GitHub Actions runner executes successfully.
+#
+# Future phases will extend this workflow to:
+# - Checkout source code
+# - Configure JDK
+# - Cache Maven dependencies
+# - Build the Spring Boot application
+# - Execute unit tests
+# - Build the Docker image
+# - Authenticate with Docker Hub
+# - Push the Docker image
+#
+# =============================================================================
+
+name: Wallet CI Workflow
 
 on:
   push:
@@ -6,9 +38,20 @@ on:
       - main
 
 jobs:
-  hello-job:
+
+  workflow-verification:
+
+    name: Verify GitHub Actions
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print Welcome Message
-        run: echo "Wallet_Workflow! My first Wallet_Workflow GitHub Action is running successfully."
+
+      - name: Display Welcome Message
+
+        run: |
+          echo "===================================================="
+          echo "MSIMPL - GitHub Actions"
+          echo "Service : ms-wallet"
+          echo "Status  : Workflow execution successful."
+          echo "===================================================="
