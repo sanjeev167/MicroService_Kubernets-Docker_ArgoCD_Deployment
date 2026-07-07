@@ -1,41 +1,21 @@
-# ==========================================================
-# MSIMPL Kubernetes Deployment
-# File      : deployment.yaml
-# Service   : ms-notification
-# Namespace : msimpl
-# Author    : Sanjeev Kumar
-#
-# Description
-# -----------
-# Deploys the Notification Microservice into the MSIMPL
-# Kubernetes cluster.
-#
-# Features
-# --------
-# - Single replica deployment
-# - Uses local Docker image (Development)
-# - Externalized configuration through ConfigMaps
-# - Sensitive configuration through Secret
-# - Resource Requests & Limits
-# - Startup, Readiness and Liveness Probes
+# =============================================================================
+# Kubernetes Deployment
+# =============================================================================
+# File        : deployment.yaml
+# Project     : MSIMPL - Microservices Platform
+# Service     : ms-notification
+# Namespace   : msimpl
+# Purpose     : Deploy the Notification microservice
+# Version     : 1.0.0
+# =============================================================================
 #
 # Notes
 # -----
-# This deployment is optimized for:
-# - Local Kubernetes Cluster
-# - 8 GB RAM Development Machine
-# - Docker Desktop
-# - Kafka
-# - PostgreSQL
-# - Prometheus
-# - Grafana
-# - Loki
-# - Promtail
+# - Uses ConfigMaps and Secrets for externalized configuration.
+# - Configured for local Kind Kubernetes.
+# - Compatible with GitHub Actions, Argo CD and AWS EKS.
 #
-# The same deployment can later be migrated to AWS EKS by
-# changing only the Docker image reference.
-#
-# ==========================================================
+# =============================================================================
 
 apiVersion: apps/v1
 kind: Deployment
@@ -67,7 +47,7 @@ spec:
 
         - name: ms-notification
 
-          image: ms-notification:1.0
+          image: sanjeev777/msimpl_dochub:ms-notification-1.0
 
           imagePullPolicy: IfNotPresent
 
@@ -118,7 +98,6 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
-            successThreshold: 1
 
           livenessProbe:
             httpGet:

@@ -1,29 +1,22 @@
-# ==========================================================
+# =============================================================================
 # Kubernetes ConfigMap
-# File      : config-map-kafka.yaml
-# Project   : MSIMPL - Microservices Platform
-# Author    : Sanjeev Kumar
-#
-# Description
-# -----------
-# Stores common, non-sensitive Kafka configuration shared
-# across all MSIMPL microservices.
-#
-# Purpose
-# -------
-# - Kafka bootstrap server
-# - Consumer behavior
-# - Producer behavior
+# =============================================================================
+# File        : config-map-kafka.yaml
+# Project     : MSIMPL - Microservices Platform
+# Purpose     : Shared non-sensitive Kafka configuration
+# Namespace   : msimpl
+# Version     : 1.0.0
+# =============================================================================
 #
 # Notes
 # -----
-# - Do NOT store Kafka username/password here.
-# - Authentication credentials must be stored in
-#   Kubernetes Secrets.
-# - Service-specific Kafka properties should remain in the
-#   respective Spring Boot application-kafka.yml files.
+# - Stores shared Kafka connection properties.
+# - Do not store usernames, passwords or credentials.
+# - Sensitive values belong in Kubernetes Secrets.
+# - Service-specific Kafka properties remain in each
+#   microservice's application-kafka.yml.
 #
-# ==========================================================
+# =============================================================================
 
 apiVersion: v1
 kind: ConfigMap
@@ -39,23 +32,26 @@ metadata:
 
 data:
 
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Kafka Connection
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
+
   KAFKA_HOST: "host.docker.internal"
 
   KAFKA_PORT: "9092"
 
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Consumer Configuration
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
+
   KAFKA_AUTO_OFFSET_RESET: "earliest"
 
   KAFKA_ENABLE_AUTO_COMMIT: "false"
 
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Producer Configuration
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
+
   KAFKA_ACKS: "all"
 
   KAFKA_RETRIES: "3"

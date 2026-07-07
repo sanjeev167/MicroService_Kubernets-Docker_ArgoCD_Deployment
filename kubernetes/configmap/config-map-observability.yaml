@@ -1,25 +1,20 @@
-# ==========================================================
+# =============================================================================
 # Kubernetes ConfigMap
-# File      : config-map-observability.yaml
-# Project   : MSIMPL - Microservices Platform
-# Author    : Sanjeev Kumar
-#
-# Description
-# -----------
-# Stores common, non-sensitive observability configuration
-# shared across all MSIMPL microservices.
-#
-# Purpose
-# -------
-# - Spring Boot Actuator configuration
-# - Prometheus metrics configuration
+# =============================================================================
+# File        : config-map-observability.yaml
+# Project     : MSIMPL - Microservices Platform
+# Purpose     : Shared non-sensitive observability configuration
+# Namespace   : msimpl
+# Version     : 1.0.0
+# =============================================================================
 #
 # Notes
 # -----
-# - Logging configuration belongs to config-map-common.yaml
-# - Sensitive values must be stored in Kubernetes Secrets.
+# - Stores shared Spring Boot Actuator and Prometheus settings.
+# - Logging configuration is maintained in config-map-common.yaml.
+# - Sensitive values belong in Kubernetes Secrets.
 #
-# ==========================================================
+# =============================================================================
 
 apiVersion: v1
 kind: ConfigMap
@@ -35,14 +30,16 @@ metadata:
 
 data:
 
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Spring Boot Actuator
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
+
   MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus"
 
   MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "always"
 
-  # --------------------------------------------------------
-  # Prometheus
-  # --------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Prometheus Metrics
+  # ---------------------------------------------------------------------------
+
   MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: "true"

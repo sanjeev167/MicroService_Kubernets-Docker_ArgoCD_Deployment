@@ -1,122 +1,63 @@
-# ==========================================================
-# PROMETHEUS CONFIGURATION (DOCKER MICROSERVICES MONITORING)
-# ==========================================================
-# Author      : Sanjeev Kumar
-# Created On  : 04-Jul-2026
-# Environment : Docker
-# Project     : MSIMPL
-# Version     : 1.0.0
+# =============================================================================
+# Prometheus Configuration
+# =============================================================================
+# File        : prometheus.yml
+# Project     : MSIMPL - Microservices Platform
+# Purpose     : Collect metrics from Kubernetes-deployed microservices
+# Environment : Docker Desktop + Kind Kubernetes
+# Version     : 2.0.0
+# =============================================================================
 #
-# PURPOSE:
-# * Collect metrics from Dockerized Spring Boot microservices
-# * Enable observability using Prometheus + Grafana
-# * Monitor application health, JVM, HTTP requests,
-#   Kafka activity, and custom business metrics
+# Notes
+# -----
+# - Prometheus runs in Docker Desktop.
+# - Spring Boot microservices run in the local Kubernetes cluster.
+# - Metrics are collected through Kubernetes Service endpoints.
 #
-# DESIGN PRINCIPLES:
-# ✔ Centralized metrics collection
-# ✔ Lightweight scraping using Spring Boot Actuator
-# ✔ Service-level isolation via job_name
-# ✔ Container-to-container communication
-# ✔ Easy integration with Grafana dashboards
-# ==========================================================
+# =============================================================================
 
-# ==========================================================
-# GLOBAL CONFIGURATION
-# ==========================================================
 global:
 
-  # --------------------------------------------------------
-  # Scrape Interval
-  # --------------------------------------------------------
-  # Defines how frequently Prometheus collects metrics.
-  #
-  # Development : 5 seconds
-  # Production  : 15–30 seconds
-  # --------------------------------------------------------
+  # Metrics collection interval
   scrape_interval: 5s
 
-# ==========================================================
-# SCRAPE CONFIGURATIONS (DOCKER MICROSERVICES)
-# ==========================================================
+
 scrape_configs:
 
-  # ==========================================================
-  # 🟢 WALLET SERVICE
-  # ==========================================================
+  # ===========================================================================
+  # Wallet Service
+  # ===========================================================================
+
   - job_name: 'ms-wallet'
 
-    # Spring Boot Actuator Prometheus endpoint
     metrics_path: '/actuator/prometheus'
 
     static_configs:
       - targets:
-          # Docker container hostname
-          - 'ms-wallet:8080'
+          - 'ms-wallet-service:8080'
 
-  # ==========================================================
-  # 🔵 NOTIFICATION SERVICE
-  # ==========================================================
+
+  # ===========================================================================
+  # Notification Service
+  # ===========================================================================
+
   - job_name: 'ms-notification'
 
     metrics_path: '/actuator/prometheus'
 
     static_configs:
       - targets:
-          - 'ms-notification:8081'
+          - 'ms-notification-service:8081'
 
-  # ==========================================================
-  # 🟣 TRANSACTION ORCHESTRATOR (SAGA CORE)
-  # ==========================================================
-  - job_name: 'ms-orchestrator'
+
+  # ===========================================================================
+  # Transaction Orchestrator Service
+  # ===========================================================================
+
+  - job_name: 'ms-transaction-orchestrator'
 
     metrics_path: '/actuator/prometheus'
 
     static_configs:
       - targets:
-          - 'ms-transaction-orchestrator:8082'
-
-# ==========================================================
-# NOTES
-# ==========================================================
-#
-# ✔ All Spring Boot microservices expose metrics through:
-#
-#     /actuator/prometheus
-#
-# ✔ Required Spring Boot dependency:
-#
-#     micrometer-registry-prometheus
-#
-# ✔ Required application configuration:
-#
-#     management.endpoints.web.exposure.include=prometheus
-#
-# ✔ Prometheus runs as a Docker container.
-#
-# ✔ All monitored applications also run as Docker containers
-#   on the shared Docker network:
-#
-#     infra_msimpl-network
-#
-# ✔ Container communication uses Docker DNS.
-#
-#     ms-wallet:8080
-#     ms-notification:8081
-#     ms-transaction-orchestrator:8082
-#
-# ✔ localhost or host.docker.internal is NOT used because
-#   applications are no longer running from STS.
-#
-# ✔ Verify Prometheus targets:
-#
-#     http://localhost:9090
-#
-#     Status
-#       → Targets
-#
-# ✔ Every target should display:
-#
-#     State : UP
-#
-# ==========================================================
+          - 'ms-transaction-orchestrator-service:8082'
