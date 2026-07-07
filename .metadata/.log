@@ -175,3 +175,8 @@ END
 
 !ENTRY org.springframework.tooling.boot.ls 1 0 2026-07-08 01:55:06.113
 !MESSAGE Classpath changed for project: _pasted_code_
+
+!ENTRY org.eclipse.core.resources 2 2 2026-07-08 04:49:37.591
+!MESSAGE Save operation warnings.
+!SUBENTRY 1 org.eclipse.core.resources 2 234 2026-07-08 04:49:37.591
+!MESSAGE The project description file (.project) for 'kubernetes' was missing.  This file contains important information about the project.  A new project description file has been created, but some information about the project may have been lost.
