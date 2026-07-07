@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "ms-transaction-orchestrator/**"
+      - ".github/workflows/ms-transaction-orchestrator-ci.yml"
 
 jobs:
   hello-job:

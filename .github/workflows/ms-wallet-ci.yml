@@ -33,6 +33,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "ms-wallet/**"
+      - ".github/workflows/ms-wallet-ci.yml"
 
 jobs:
 

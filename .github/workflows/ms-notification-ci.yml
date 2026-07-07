@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "ms-notification/**"
+      - ".github/workflows/ms-notification-ci.yml"
 
 jobs:
   hello-job:
