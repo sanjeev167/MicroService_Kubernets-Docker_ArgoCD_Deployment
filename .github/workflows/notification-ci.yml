@@ -1,0 +1,14 @@
+name: Notification_Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  hello-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print Welcome Message
+        run: echo "Hello Notification_Workflow! My Notification_Workflow GitHub Action is running successfully."

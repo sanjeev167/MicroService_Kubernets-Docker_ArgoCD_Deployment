@@ -1,4 +1,4 @@
-name: Hello MSIMPL
+name: Wallet_Workflow
 
 on:
   push:
@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Print Welcome Message
-        run: echo "Hello MSIMPL! My first GitHub Action is running successfully."
+        run: echo "Wallet_Workflow! My first Wallet_Workflow GitHub Action is running successfully."
