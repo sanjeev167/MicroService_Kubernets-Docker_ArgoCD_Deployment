@@ -125,7 +125,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       # --------------------------------------------------------
-      # Step 6 - Build Spring Boot Application
+      # Step 6 - Build Spring Boot Application a
       # --------------------------------------------------------
       - name: Build Spring Boot Application
         run: mvn clean install -DskipTests
