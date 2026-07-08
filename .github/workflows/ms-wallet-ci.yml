@@ -1,5 +1,6 @@
+
 # =============================================================================
-# GitHub Actions - Continuous Integration (CI)
+# GitHub Actions - Continuous Integration (CI) + GitOps
 # =============================================================================
 # File        : ms-wallet-ci.yml
 # Project     : MSIMPL - Microservices Platform
@@ -7,57 +8,44 @@
 #
 # Description
 # -----------------------------------------------------------------------------
-# This workflow performs Continuous Integration (CI) for the ms-wallet
-# microservice.
+# This workflow performs:
+#   1. Build Spring Boot application
+#   2. Build Docker image
+#   3. Push Docker image to Docker Hub
+#   4. Checkout GitOps repository
+#   5. Update Kubernetes Deployment image tag
+#   6. Commit and Push GitOps repository
 #
-# Activities Performed
-# --------------------
-# 1. Checkout source code
-# 2. Configure JDK 17
-# 3. Verify Java installation
-# 4. Generate Docker image tag (v<project.version>-<git-short-sha>)
-# 5. Cache Maven dependencies
-# 6. Build Spring Boot application
-# 7. Verify generated JAR
-# 8. Upload build artifact
-# 9. Login to Docker Hub
-# 10. Configure Docker Buildx
-# 11. Cache Docker build layers
-# 12. Build Docker image
-# 13. Verify Docker image
-# 14. Display workflow summary
-#
-# Image Tag Format
-# ----------------
-# v<project.version>-<git-short-sha>
-#
-# Example:
-# v1.0.0-8af34bc
-#
-# NOTE:
-# Docker image push will be added in the next enhancement step.
-#
-# Environment : GitHub Actions
-# JDK         : Temurin 17
-# Runner      : ubuntu-latest
-# Version     : 2.1.0
-# Author      : Sanjeev Kumar
+# GitOps Flow
+# -----------------------------------------------------------------------------
+# Developer
+#    ↓
+# Git Push
+#    ↓
+# GitHub Actions
+#    ↓
+# Docker Hub
+#    ↓
+# GitOps Repository Updated
+#    ↓
+# Argo CD
+#    ↓
+# Kubernetes
 # =============================================================================
 
 name: Wallet CI Workflow
 
-run-name: Build & Package ms-wallet
+run-name: Build, Publish & Update GitOps - ms-wallet
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - "ms-wallet/**"
       - ".github/workflows/ms-wallet-ci.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: wallet-ci-${{ github.ref }}
@@ -66,57 +54,41 @@ concurrency:
 jobs:
   build-and-package:
 
-    name: Build, Package & Verify
+    name: Build, Package & Publish
 
     runs-on: ubuntu-latest
-
     timeout-minutes: 20
-
-    defaults:
-      run:
-        working-directory: ms-wallet
 
     steps:
 
-      # --------------------------------------------------------
-      # Step 1 - Checkout Repository
-      # --------------------------------------------------------
-      - name: Checkout Repository
+      # Step 1 - Checkout Application Repository
+      - name: Checkout Application Repository
         uses: actions/checkout@v4
 
-      # --------------------------------------------------------
-      # Step 2 - Setup Java 17
-      # --------------------------------------------------------
+      # Step 2 - Setup Java
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
-      # --------------------------------------------------------
-      # Step 3 - Verify Java Installation
-      # --------------------------------------------------------
-      - name: Verify Java Installation
+      # Step 3 - Verify Java
+      - name: Verify Java
         run: |
           java -version
           javac -version
 
-      # --------------------------------------------------------
-      # Step 4 - Generate Docker Image Tag
-      # Format : v<project.version>-<git-short-sha>
-      # --------------------------------------------------------
-      - name: Generate Docker Image Tag
+      # Step 4 - Generate Image Tag
+      - name: Generate Image Tag
+        working-directory: ms-wallet
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           SHORT_SHA=$(git rev-parse --short HEAD)
           IMAGE_TAG="v${VERSION}-${SHORT_SHA}"
           echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
-          echo "Generated Image Tag : ${IMAGE_TAG}"
 
-      # --------------------------------------------------------
-      # Step 5 - Cache Maven Dependencies
-      # --------------------------------------------------------
-      - name: Cache Maven Dependencies
+      # Step 5 - Cache Maven
+      - name: Cache Maven
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
@@ -124,195 +96,87 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # --------------------------------------------------------
-      # Step 6 - Build Spring Boot Application a
-      # --------------------------------------------------------
-      - name: Build Spring Boot Application
+      # Step 6 - Build Application
+      - name: Build Application
+        working-directory: ms-wallet
         run: mvn clean install -DskipTests
 
-      # --------------------------------------------------------
-      # Step 7 - Verify Build Artifact
-      # --------------------------------------------------------
-      - name: Verify Build Artifact
-        run: |
-          echo "Generated Build Artifacts"
-          ls -lh target
-
-      # --------------------------------------------------------
-      # Step 8 - Upload Build Artifact
-      # --------------------------------------------------------
-      - name: Upload Build Artifact
+      # Step 7 - Upload Artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ms-wallet-jar
           path: ms-wallet/target/*.jar
 
-      # --------------------------------------------------------
-      # Step 9 - Login to Docker Hub
-      # Required Secrets:
-      # DOCKER_USERNAME
-      # DOCKER_TOKEN
-      # --------------------------------------------------------
-      - name: Login to Docker Hub
+      # Step 8 - Docker Login
+      - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      # --------------------------------------------------------
-      # Step 10 - Setup Docker Buildx
-      # --------------------------------------------------------
+      # Step 9 - Setup Buildx
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # --------------------------------------------------------
-      # Step 11 - Cache Docker Build Layers
-      # --------------------------------------------------------
-      - name: Cache Docker Layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      # --------------------------------------------------------
-      # Step 12 - Build Docker Image
-      # --------------------------------------------------------
+      # Step 10 - Build Docker Image
       - name: Build Docker Image
+        working-directory: ms-wallet
         run: |
-          docker build \
-            -t ${{ secrets.DOCKER_USERNAME }}/ms-wallet:${IMAGE_TAG} \
-            .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/ms-wallet:${IMAGE_TAG} .
 
-      # --------------------------------------------------------
-      # Step 13 - Verify Docker Image
-      # --------------------------------------------------------
-      - name: Verify Docker Image
-        run: |
-          docker images ${{ secrets.DOCKER_USERNAME }}/ms-wallet
-
-      
-      
-      # --------------------------------------------------------
-      # Step 14
-      # Push Docker Image
-      #
-      # Pushes the generated Docker image to Docker Hub.
-      #
-      # Image Tag Format
-      # ----------------
-      # v<project.version>-<git-short-sha>
-      #
-      # Example:
-      # v1.0.0-8af34bc
-      # --------------------------------------------------------
-
+      # Step 11 - Push Docker Image
       - name: Push Docker Image
-
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/ms-wallet:${IMAGE_TAG}
-          
-          
-      # --------------------------------------------------------
-      # Step 15
-      # Verify Docker Push
-      #
-      # Displays the Docker image details that were pushed to
-      # Docker Hub.
-      # --------------------------------------------------------
 
-      - name: Verify Docker Push
-
-        run: |
-          echo "======================================================="
-          echo "Docker Image Successfully Published"
-          echo "Repository : ${{ secrets.DOCKER_USERNAME }}/ms-wallet"
-          echo "Image Tag  : ${IMAGE_TAG}"
-          echo "======================================================="  
-          
-      # --------------------------------------------------------
-      # Step 16
-      # Checkout GitOps Repository
-      # --------------------------------------------------------
+      # Step 12 - Checkout GitOps Repository
       - name: Checkout GitOps Repository
         uses: actions/checkout@v4
         with:
           repository: sanjeev167/msimpl-gitops
           token: ${{ secrets.GITOPS_PAT }}
-          path: ../gitops
+          path: gitops
 
-      # --------------------------------------------------------
-      # Step 17
-      # Install yq
-      # --------------------------------------------------------
+      # Step 13 - Install yq
       - name: Install yq
         run: |
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
           yq --version
 
-      # --------------------------------------------------------
-      # Step 18
-      # Update Deployment Manifest
-      # --------------------------------------------------------
+      # Step 14 - Update Deployment Manifest
       - name: Update Deployment Manifest
+        working-directory: gitops
         run: |
-          yq -i '.spec.template.spec.containers[0].image = "${{ secrets.DOCKER_USERNAME }}/ms-wallet:${{ env.IMAGE_TAG }}"' \
-          ../gitops/kubernetes/deployment/ms-wallet/deployment.yaml
+          yq -i '.spec.template.spec.containers[0].image="${{ secrets.DOCKER_USERNAME }}/ms-wallet:${{ env.IMAGE_TAG }}"'           kubernetes/deployment/ms-wallet/deployment.yaml
 
-      # --------------------------------------------------------
-      # Step 19
-      # Verify Updated Manifest
-      # --------------------------------------------------------
-      - name: Verify Updated Manifest
-        run: |
-          grep "image:" ../gitops/kubernetes/deployment/ms-wallet/deployment.yaml
+      # Step 15 - Verify Manifest
+      - name: Verify Manifest
+        working-directory: gitops
+        run: grep "image:" kubernetes/deployment/ms-wallet/deployment.yaml
 
-      # --------------------------------------------------------
-      # Step 20
-      # Commit GitOps Changes
-      # --------------------------------------------------------
+      # Step 16 - Commit Changes
       - name: Commit GitOps Changes
+        working-directory: gitops
         run: |
-          cd ../gitops
-
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-
           git add kubernetes/deployment/ms-wallet/deployment.yaml
-
           if git diff --cached --quiet; then
             echo "No changes detected."
           else
             git commit -m "ci(ms-wallet): update image to ${IMAGE_TAG}"
           fi
 
-      # --------------------------------------------------------
-      # Step 21
-      # Push GitOps Repository
-      # --------------------------------------------------------
+      # Step 17 - Push GitOps Repository
       - name: Push GitOps Repository
-        run: |
-          cd ../gitops
-          git push
+        working-directory: gitops
+        run: git push
 
-      # --------------------------------------------------------
-      # Step 22
-      # Display Workflow Summary
-      # --------------------------------------------------------
-      - name: Display Workflow Summary
+      # Step 18 - Workflow Summary
+      - name: Workflow Summary
         run: |
-          echo "======================================================="
-          echo "MSIMPL - Continuous Integration"
-          echo "======================================================="
-          echo "Service        : ms-wallet"
-          echo "Build          : SUCCESS"
-          echo "Docker Image   : Published"
-          echo "Image Tag      : ${IMAGE_TAG}"
-          echo "GitOps Repo    : Updated"
-          echo "Deployment     : Waiting for Argo CD Synchronization"
-          echo "======================================================="              
-             
-          
-  
+          echo "Build Successful"
+          echo "Image : ${{ secrets.DOCKER_USERNAME }}/ms-wallet:${IMAGE_TAG}"
+          echo "GitOps repository updated."
