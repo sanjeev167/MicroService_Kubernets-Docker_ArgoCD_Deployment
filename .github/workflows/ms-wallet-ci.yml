@@ -15,7 +15,6 @@
 #   4. Checkout GitOps repository
 #   5. Update Kubernetes Deployment image tag
 #   6. Commit and Push GitOps repository
-#   7
 #
 # GitOps Flow
 # -----------------------------------------------------------------------------
@@ -145,7 +144,10 @@ jobs:
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
           yq --version
-
+          
+          
+          
+      
       # Step 14 - Update Deployment Manifest
       - name: Update Deployment Manifest
         working-directory: gitops
@@ -155,8 +157,7 @@ jobs:
       # Step 15 - Verify Manifest
       - name: Verify Manifest
         working-directory: gitops
-        run: yq '.spec.template.spec.containers[0].image' \
-             kubernetes/applications/ms-wallet/deployment.yaml
+        run: yq '.spec.template.spec.containers[0].image' kubernetes/applications/ms-wallet/deployment.yaml
 
       # Step 16 - Commit Changes
       - name: Commit GitOps Changes
