@@ -15,6 +15,7 @@
 #   4. Checkout GitOps repository
 #   5. Update Kubernetes Deployment image tag
 #   6. Commit and Push GitOps repository
+#   7
 #
 # GitOps Flow
 # -----------------------------------------------------------------------------
