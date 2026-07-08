@@ -2,7 +2,7 @@
 # GitHub Actions - Continuous Integration (CI) + GitOps
 # =============================================================================
 # File        : ms-notification-ci.yml
-# Project     : MSIMPL - Microservices Platform
+# Project     : MSIMPL - Microservices Platform 
 # Service     : ms-notification
 #
 # Description
