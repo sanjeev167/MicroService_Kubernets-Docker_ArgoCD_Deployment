@@ -229,29 +229,90 @@ jobs:
           echo "Docker Image Successfully Published"
           echo "Repository : ${{ secrets.DOCKER_USERNAME }}/ms-wallet"
           echo "Image Tag  : ${IMAGE_TAG}"
-          echo "======================================================="     
+          echo "======================================================="  
           
       # --------------------------------------------------------
       # Step 16
+      # Checkout GitOps Repository
+      # --------------------------------------------------------
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: sanjeev167/msimpl-gitops
+          token: ${{ secrets.GITOPS_PAT }}
+          path: ../gitops
+
+      # --------------------------------------------------------
+      # Step 17
+      # Install yq
+      # --------------------------------------------------------
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
+      # --------------------------------------------------------
+      # Step 18
+      # Update Deployment Manifest
+      # --------------------------------------------------------
+      - name: Update Deployment Manifest
+        run: |
+          yq -i '.spec.template.spec.containers[0].image = "${{ secrets.DOCKER_USERNAME }}/ms-wallet:${{ env.IMAGE_TAG }}"' \
+          ../gitops/kubernetes/deployment/ms-wallet/deployment.yaml
+
+      # --------------------------------------------------------
+      # Step 19
+      # Verify Updated Manifest
+      # --------------------------------------------------------
+      - name: Verify Updated Manifest
+        run: |
+          grep "image:" ../gitops/kubernetes/deployment/ms-wallet/deployment.yaml
+
+      # --------------------------------------------------------
+      # Step 20
+      # Commit GitOps Changes
+      # --------------------------------------------------------
+      - name: Commit GitOps Changes
+        run: |
+          cd ../gitops
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add kubernetes/deployment/ms-wallet/deployment.yaml
+
+          if git diff --cached --quiet; then
+            echo "No changes detected."
+          else
+            git commit -m "ci(ms-wallet): update image to ${IMAGE_TAG}"
+          fi
+
+      # --------------------------------------------------------
+      # Step 21
+      # Push GitOps Repository
+      # --------------------------------------------------------
+      - name: Push GitOps Repository
+        run: |
+          cd ../gitops
+          git push
+
+      # --------------------------------------------------------
+      # Step 22
       # Display Workflow Summary
       # --------------------------------------------------------
-
       - name: Display Workflow Summary
-
         run: |
           echo "======================================================="
           echo "MSIMPL - Continuous Integration"
           echo "======================================================="
           echo "Service        : ms-wallet"
-          echo "JDK            : Temurin 17"
           echo "Build          : SUCCESS"
-          echo "Artifact       : JAR Generated"
-          echo "Docker Image   : Built Successfully"
+          echo "Docker Image   : Published"
           echo "Image Tag      : ${IMAGE_TAG}"
-          echo "Registry       : Docker Hub"
-          echo "Docker Push    : SUCCESS"
-          echo "Status         : Ready for Argo CD"
-          echo "======================================================="
+          echo "GitOps Repo    : Updated"
+          echo "Deployment     : Waiting for Argo CD Synchronization"
+          echo "======================================================="              
+             
           
-          
-     
+  
