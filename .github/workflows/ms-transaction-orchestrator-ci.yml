@@ -1,17 +1,186 @@
-name: Orchestrator_Workflow
+# =============================================================================
+# GitHub Actions - Continuous Integration (CI) + GitOps
+# =============================================================================
+# File        : ms-transaction-orchestrator-ci.yml
+# Project     : MSIMPL - Microservices Platform
+# Service     : ms-transaction-orchestrator
+#
+# Description
+# -----------------------------------------------------------------------------
+# This workflow performs:
+#   1. Build Spring Boot application
+#   2. Build Docker image
+#   3. Push Docker image to Docker Hub
+#   4. Checkout GitOps repository
+#   5. Update Kubernetes Deployment image tag
+#   6. Commit and Push GitOps repository
+#
+# GitOps Flow
+# -----------------------------------------------------------------------------
+# Developer
+#    ↓
+# Git Push
+#    ↓
+# GitHub Actions
+#    ↓
+# Docker Hub
+#    ↓
+# GitOps Repository Updated
+#    ↓
+# Argo CD
+#    ↓
+# Kubernetes
+# =============================================================================
+
+name: Transaction Orchestrator CI Workflow
+
+run-name: Build, Publish & Update GitOps - ms-transaction-orchestrator
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - "ms-transaction-orchestrator/**"
       - ".github/workflows/ms-transaction-orchestrator-ci.yml"
 
+permissions:
+  contents: write
+
+concurrency:
+  group: transaction-orchestrator-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  hello-job:
+  build-and-package:
+
+    name: Build, Package & Publish
+
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
-      - name: Print Welcome Message
-        run: echo "Hello Orchestrator_Workflow! My Orchestrator_Workflow GitHub Action is running successfully."
+
+      # Step 1 - Checkout Application Repository
+      - name: Checkout Application Repository
+        uses: actions/checkout@v4
+
+      # Step 2 - Setup Java
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # Step 3 - Verify Java
+      - name: Verify Java
+        run: |
+          java -version
+          javac -version
+
+      # Step 4 - Generate Image Tag
+      - name: Generate Image Tag
+        working-directory: ms-transaction-orchestrator
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          IMAGE_TAG="v${VERSION}-${SHORT_SHA}"
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+
+      # Step 5 - Cache Maven
+      - name: Cache Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Step 6 - Build Application
+      - name: Build Application
+        working-directory: ms-transaction-orchestrator
+        run: mvn clean install -DskipTests
+
+      # Step 7 - Upload Artifact
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ms-transaction-orchestrator-jar
+          path: ms-transaction-orchestrator/target/*.jar
+
+      # Step 8 - Docker Login
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # Step 9 - Setup Docker Buildx
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 10 - Build Docker Image
+      - name: Build Docker Image
+        working-directory: ms-transaction-orchestrator
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/ms-transaction-orchestrator:${IMAGE_TAG} .
+
+      # Step 11 - Push Docker Image
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/ms-transaction-orchestrator:${IMAGE_TAG}
+
+      # Step 12 - Checkout GitOps Repository
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: sanjeev167/msimpl-gitops
+          token: ${{ secrets.GITOPS_PAT }}
+          path: gitops
+
+      # Step 13 - Install yq
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
+      # Step 14 - Update Deployment Manifest
+      - name: Update Deployment Manifest
+        working-directory: gitops
+        run: |
+          yq -i '.spec.template.spec.containers[0].image="${{ secrets.DOCKER_USERNAME }}/ms-transaction-orchestrator:${{ env.IMAGE_TAG }}"' \
+          kubernetes/applications/ms-transaction-orchestrator/deployment.yaml
+
+      # Step 15 - Verify Manifest
+      - name: Verify Manifest
+        working-directory: gitops
+        run: |
+          yq '.spec.template.spec.containers[0].image' \
+          kubernetes/applications/ms-transaction-orchestrator/deployment.yaml
+
+      # Step 16 - Commit GitOps Changes
+      - name: Commit GitOps Changes
+        working-directory: gitops
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add kubernetes/applications/ms-transaction-orchestrator/deployment.yaml
+
+          if git diff --cached --quiet; then
+            echo "No changes detected."
+          else
+            git commit -m "ci(ms-transaction-orchestrator): update image to ${IMAGE_TAG}"
+          fi
+
+      # Step 17 - Push GitOps Repository
+      - name: Push GitOps Repository
+        working-directory: gitops
+        run: git push
+
+      # Step 18 - Workflow Summary
+      - name: Workflow Summary
+        run: |
+          echo "Build Successful"
+          echo "Image : ${{ secrets.DOCKER_USERNAME }}/ms-transaction-orchestrator:${IMAGE_TAG}"
+          echo "GitOps repository updated."
