@@ -149,12 +149,13 @@ jobs:
       - name: Update Deployment Manifest
         working-directory: gitops
         run: |
-          yq -i '.spec.template.spec.containers[0].image="${{ secrets.DOCKER_USERNAME }}/ms-wallet:${{ env.IMAGE_TAG }}"'           kubernetes/deployment/ms-wallet/deployment.yaml
+          yq -i '.spec.template.spec.containers[0].image="${{ secrets.DOCKER_USERNAME }}/ms-wallet:${{ env.IMAGE_TAG }}"'           kubernetes/applications/ms-wallet/deployment.yaml
 
       # Step 15 - Verify Manifest
       - name: Verify Manifest
         working-directory: gitops
-        run: grep "image:" kubernetes/deployment/ms-wallet/deployment.yaml
+        run: yq '.spec.template.spec.containers[0].image' \
+             kubernetes/applications/ms-wallet/deployment.yaml
 
       # Step 16 - Commit Changes
       - name: Commit GitOps Changes
@@ -162,7 +163,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add kubernetes/deployment/ms-wallet/deployment.yaml
+          git add kubernetes/applications/ms-wallet/deployment.yaml
           if git diff --cached --quiet; then
             echo "No changes detected."
           else
@@ -174,7 +175,7 @@ jobs:
         working-directory: gitops
         run: git push
 
-      # Step 18 - Workflow Summary  d
+      # Step 18 - Workflow Summary
       - name: Workflow Summary
         run: |
           echo "Build Successful"
