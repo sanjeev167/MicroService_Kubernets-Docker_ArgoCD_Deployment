@@ -172,10 +172,26 @@ jobs:
             git commit -m "ci(ms-wallet): update image to ${IMAGE_TAG}"
           fi
 
-      # Step 17 - Push GitOps Repository
+        # Step 17 - Push GitOps Repository
       - name: Push GitOps Repository
         working-directory: gitops
-        run: git push
+        run: |
+          for i in 1 2 3; do
+            echo "Attempt $i..."
+
+            git pull --rebase origin main
+
+            if git push origin main; then
+              echo "GitOps repository updated successfully."
+              exit 0
+            fi
+
+            echo "Push failed. Retrying in 5 seconds..."
+            sleep 5
+          done
+
+          echo "Failed to push changes after 3 attempts."
+          exit 1
 
       # Step 18 - Workflow Summary
       - name: Workflow Summary
