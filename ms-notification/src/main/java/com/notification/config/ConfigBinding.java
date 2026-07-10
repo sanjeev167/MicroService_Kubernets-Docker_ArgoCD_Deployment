@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
  * ==========================================================
  * Component: ConfigBinding
  * Package: com.notification.config
- * Service: ms-transaction-notification
+ * Service: ms-transaction-notification 
  * Author: Sanjeev Kumar
  *
  * <p><b>Description:</b></p>
