@@ -66,7 +66,6 @@ INDEX VERSION 1.134+F:\MicroserviceWithKubernetAndArgoCD_7_7_2026\MicroServiceWi
 2762355811.index
 1870005669.index
 4248014856.index
-2895222224.index
 2163976474.index
 2516224330.index
 1009024891.index
