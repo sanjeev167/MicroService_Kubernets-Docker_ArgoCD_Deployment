@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
  * ==========================================================
  * Component: ConfigBinding
  * Package: com.wallet.config   
- * Service: ms-transaction-wallet 
+ * Service: ms-transaction-wallet
  * Author: Sanjeev Kumar
  *
  * <p><b>Description:</b></p>
